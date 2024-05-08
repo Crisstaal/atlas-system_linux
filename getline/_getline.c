@@ -17,11 +17,7 @@ char *_getline(const int fd) {
     if (!stream || !line || !len) {
         return -1;
     }
-
-    /* Attempt to read from stream, resize buffers, etc. */
-    size_t bytes_read = fread(static_buffer, 1, 128, stream); /* Sample reading example */
     
-    /* Handle buffer initialization or reallocation */
     if (static_buffer == NULL) {
         static_buffer_len = 128; /* Example buffer size */
         static_buffer = malloc(static_buffer_len);
@@ -37,7 +33,7 @@ char *_getline(const int fd) {
     }
 
     /* Find the newline position in the static buffer */
-    newline_pos = strchr(static_buffer, '\n'); /* Using declared variable */
+    newline_pos = strchr(static_buffer, '\n'); 
 
     if (newline_pos) {
         line_len = newline_pos - static_buffer; /* Using declared variable */
