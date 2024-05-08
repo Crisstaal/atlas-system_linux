@@ -7,14 +7,16 @@
 /* Assumes this is part of a larger code file */
 
 char *_getline(int fd) {
-    bytes_read = read(fd, static_buffer + static_buffer_len, 128);
-    char *line = malloc(line_len + 1);
-    size_t remaining_len = static_buffer_len - line_len - 1;
     static char *static_buffer = NULL;
     static size_t static_buffer_len = 0;
     size_t line_len = 0;
     ssize_t bytes_read = 0;
     char *newline_pos = NULL;
+
+     bytes_read = read(fd, static_buffer + static_buffer_len, 128);
+    char *line = malloc(line_len + 1);
+    size_t remaining_len = static_buffer_len - line_len - 1;
+
 
     if (static_buffer == NULL) {
         static_buffer_len = 128; /* Initial buffer size */
