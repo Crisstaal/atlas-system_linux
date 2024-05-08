@@ -13,8 +13,6 @@ char *_getline(const int fd) {
     char *newline_pos = NULL;
     size_t line_len;
     size_t remaining_len;
-    char *new_buffer = realloc(static_buffer, static_buffer_len + bytes_read);
-    char *result = malloc(line_len + 1);
 
     while ((newline_pos = strchr(static_buffer, '\n')) == NULL) {
         /* Read from the file descriptor into buffer */
