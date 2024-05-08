@@ -1,74 +1,55 @@
+#include <stddef.h>
+#include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 
+#define MAX_CARS 10
 typedef struct {
-    int id;
-    int laps;
+    char identifier[10];
+    unsigned int laps;
 } Car;
 
-// Global array to hold the list of cars in the race
-Car* race = NULL;
+Car race[MAX_CARS];
 size_t race_size = 0;
 
-// Find the index of a car
-int find_car_index(int id) {
-    for (size_t i = 0; i < race_size; i++) {
-        if (race[i].id == id) {
-            return (int)i;
+int find_car_index(const char* identifier) {
+    size_t i;
+    for (i = 0; i < race_size; i++) {
+        if (strcmp(race[i].identifier, identifier) == 0) {
+            return i;
         }
     }
     return -1;
 }
 
-// Comparison function for sorting cars by their identifier
-int compare_cars(const void* a, const void* b) {
-    const Car* car1 = (const Car*)a;
-    const Car* car2 = (const Car*)b;
-    return car1->id - car2->id;
-}
-
-// Function to print the current state of the race
 void print_race_state() {
-    printf("Race state:\n");
-    for (size_t i = 0; i < race_size; i++) {
-        printf("Car %d [%d laps]\n", race[i].id, race[i].laps);
+    size_t i;
+    for (i = 0; i < race_size; i++) {
+        printf("Car %s: %u laps\n", race[i].identifier, race[i].laps);
     }
 }
 
-// The race_state function to handle adding cars, updating laps, and printing the state
-void race_state(int* id, size_t size) {
-    if (size == 0) {
-        // Free the global array and reset race_size to 0
-        free(race);
-        race = NULL;
-        race_size = 0;
-        return;
+void race_state(const char* identifier) {
+    int car_index = find_car_index(identifier);
+    if (car_index == -1) {
+        /* If the car doesn't exist, add it to the race */
+        strcpy(race[race_size].identifier, identifier);
+        race[race_size].laps = 1;
+        race_size++;
+    } else {
+        /* If the car exists, increment its lap count */
+        race[car_index].laps++;
     }
+}
 
-    // Process each ID in the input array
-    for (size_t i = 0; i < size; i++) {
-        int car_index = find_car_index(id[i]);
-        
-        if (car_index == -1) { // New car, add it to the race
-            race_size++;
-            race = realloc(race, race_size * sizeof(Car));
-            if (race == NULL) { // Ensure memory allocation is successful
-                fprintf(stderr, "Memory allocation failed!\n");
-                exit(1);
-            }
-            race[race_size - 1].id = id[i];
-            race[race_size - 1].laps = 0;
-            printf("Car %d joined the race\n", id[i]);
-        }
-        
-        // Increment laps for the car
-        race[car_index == -1 ? race_size - 1 : car_index].laps++;
-    }
-
-    // Sort the race cars by their identifier
-    qsort(race, race_size, sizeof(Car), compare_cars);
-
-    // Print the current state of the race
+/* This function demonstrates the usage of race_state */
+void update_race() {
+    race_state("car1");
+    race_state("car2");
+    race_state("car1");
     print_race_state();
 }
 
+int main() {
+    update_race();
+    return 0;
+}
