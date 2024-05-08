@@ -12,9 +12,9 @@ char *_getline(int fd) {
     size_t line_len = 0;
     ssize_t bytes_read = 0;
     char *newline_pos = NULL;
+    char *line = malloc(line_len + 1);
 
      bytes_read = read(fd, static_buffer + static_buffer_len, 128);
-    char *line = malloc(line_len + 1);
     size_t remaining_len = static_buffer_len - line_len - 1;
 
 
