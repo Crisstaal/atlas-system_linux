@@ -1,10 +1,15 @@
 #include <stdio.h>
+#include "getline.h"
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
 /* Assumes this is part of a larger code file */
 
 char *_getline(int fd) {
+    bytes_read = read(fd, static_buffer + static_buffer_len, 128);
+    char *line = malloc(line_len + 1);
+    size_t remaining_len = static_buffer_len - line_len - 1;
     static char *static_buffer = NULL;
     static size_t static_buffer_len = 0;
     size_t line_len = 0;
@@ -19,29 +24,22 @@ char *_getline(int fd) {
         }
     }
 
-    /* Read from the file descriptor into the buffer */
-    bytes_read = read(fd, static_buffer + static_buffer_len, 128);
     if (bytes_read <= 0) {
         return NULL; /* End of file or read error */
     }
 
     static_buffer_len += bytes_read;
 
-    /* Find the newline position in the static buffer */
     newline_pos = strchr(static_buffer, '\n');
     if (newline_pos) {
         line_len = newline_pos - static_buffer; /* Length of the line */
-        char *line = malloc(line_len + 1); /* Allocate memory for the line */
         if (line == NULL) {
             return NULL; /* Memory allocation failed */
         }
 
         /* Copy the line from static_buffer */
         strncpy(line, static_buffer, line_len);
-        line[line_len] = '\0'; /* Null-terminate the string */
-
-        /* Move the remaining data in the static buffer */
-        size_t remaining_len = static_buffer_len - line_len - 1;
+        line[line_len] = '\0';
         memmove(static_buffer, newline_pos + 1, remaining_len);
         static_buffer_len = remaining_len;
 
