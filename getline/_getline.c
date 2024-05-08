@@ -13,6 +13,8 @@ char *_getline(const int fd) {
     char *newline_pos = NULL;
     size_t line_len;
     size_t remaining_len;
+    char *new_buffer = realloc(static_buffer, static_buffer_len + bytes_read);
+    char *result = malloc(line_len + 1);
 
     while ((newline_pos = strchr(static_buffer, '\n')) == NULL) {
         /* Read from the file descriptor into buffer */
@@ -40,8 +42,6 @@ char *_getline(const int fd) {
             }
         }
 
-        /* Extend the static buffer to accommodate new data */
-        char *new_buffer = realloc(static_buffer, static_buffer_len + bytes_read);
         if (!new_buffer) {
             free(static_buffer);
             static_buffer = NULL;
@@ -57,7 +57,6 @@ char *_getline(const int fd) {
 
     /* Extract the line up to the newline character */
     line_len = newline_pos - static_buffer;
-    char *result = malloc(line_len + 1);
     if (!result) {
         return NULL;
     }
