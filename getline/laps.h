@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 
-/*Function prototype for race_state*/
-void race_state(const char* identifier);
+void race_state(int *id, size_t size)
 
 #endif

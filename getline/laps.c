@@ -53,7 +53,7 @@ void update_race() {
 
 int main() {
     const char* ids[] = {"car1", "car2"};
-    // Corrected call - pass a single string
+
     race_state(ids[0]);  
     race_state(ids[1]);  
 }
