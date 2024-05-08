@@ -1,77 +1,56 @@
 #include "_getline.h"
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <string.h>
 
-static char *static_buffer = NULL;
-static size_t static_buffer_len = 0;
+/* Assuming this is part of a larger code file */
 
-char *_getline(const int fd) {
-    /* Declare variables with initial values */
-    char buffer[READ_SIZE];
-    ssize_t bytes_read = 0;
+ssize_t _getline(char **line, size_t *len, FILE *stream) {
+    /* Declare all variables at the beginning */
+    static char *static_buffer = NULL;
+    static size_t static_buffer_len = 0;
     char *newline_pos = NULL;
+    size_t line_len = 0;
+    size_t remaining_len = 0;
 
-    /* Loop until a newline is found or no more data is available */
-    while ((newline_pos = strchr(static_buffer, '\n')) == NULL) {
-        bytes_read = read(fd, buffer, READ_SIZE);
-        
-        if (bytes_read <= 0) {  /* EOF or error */
-            if (static_buffer_len == 0) {
-                /* No more lines to return */
-                free(static_buffer);
-                static_buffer = NULL;
-                static_buffer_len = 0;
-                return NULL;
-            } else {
-                /* Return the remaining data without newline */
-                char *result = malloc(static_buffer_len + 1);
-                if (!result) {
-                    return NULL;
-                }
-                memcpy(result, static_buffer, static_buffer_len);
-                result[static_buffer_len] = '\0';
-                free(static_buffer);
-                static_buffer = NULL;
-                static_buffer_len = 0;
-                return result;
-            }
-        }
+    /* Check for valid parameters */
+    if (!stream || !line || !len) {
+        return -1;
+    }
 
-        /* Before reallocating, declare new_buffer */
-        char *new_buffer = realloc(static_buffer, static_buffer_len + bytes_read);
-        if (!new_buffer) {
+    /* Attempt to read from stream, resize buffers, etc. */
+    size_t bytes_read = fread(static_buffer, 1, 128, stream); /* Sample reading example */
+    
+    /* Handle buffer initialization or reallocation */
+    if (static_buffer == NULL) {
+        static_buffer_len = 128; /* Example buffer size */
+        static_buffer = malloc(static_buffer_len);
+    } else {
+        char *new_buffer = realloc(static_buffer, static_buffer_len + bytes_read); /* Using declared variable */
+        if (new_buffer == NULL) {
             free(static_buffer);
             static_buffer = NULL;
-            static_buffer_len = 0;
-            return NULL;
+            return -1;
         }
         static_buffer = new_buffer;
-
-        /* Append new data to static_buffer */
-        memcpy(static_buffer + static_buffer_len, buffer, bytes_read);
         static_buffer_len += bytes_read;
     }
 
-    /* Calculate line_len and declare result before using it */
-    size_t line_len = newline_pos - static_buffer;
-    char *result = malloc(line_len + 1);
-    if (!result) {
-        return NULL;
-    }
-    memcpy(result, static_buffer, line_len);
-    result[line_len] = '\0';
+    /* Find the newline position in the static buffer */
+    newline_pos = strchr(static_buffer, '\n'); /* Using declared variable */
 
-    /* Adjust static_buffer after extracting the line */
-    size_t remaining_len = static_buffer_len - line_len - 1;
-    if (remaining_len > 0) {
+    if (newline_pos) {
+        line_len = newline_pos - static_buffer; /* Using declared variable */
+        *line = malloc(line_len + 1); /* Allocate memory for the line */
+        strncpy(*line, static_buffer, line_len);
+        (*line)[line_len] = '\0';
+
+        remaining_len = static_buffer_len - line_len - 1; /* Using declared variable */
         memmove(static_buffer, newline_pos + 1, remaining_len);
-    } else {
-        free(static_buffer);
-        static_buffer = NULL;
-    }
-    static_buffer_len = remaining_len;
+        static_buffer_len = remaining_len;
 
-    return result;
+        return line_len;
+    }
+
+    return -1;
 }
