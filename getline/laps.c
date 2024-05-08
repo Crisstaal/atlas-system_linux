@@ -1,8 +1,9 @@
-#include <stddef.h>
+#include "laps.h"
 #include <string.h>
 #include <stdio.h>
 
 #define MAX_CARS 10
+
 typedef struct {
     char identifier[10];
     unsigned int laps;
@@ -12,8 +13,7 @@ Car race[MAX_CARS];
 size_t race_size = 0;
 
 int find_car_index(const char* identifier) {
-    size_t i;
-    for (i = 0; i < race_size; i++) {
+    for (size_t i = 0; i < race_size; i++) {
         if (strcmp(race[i].identifier, identifier) == 0) {
             return i;
         }
@@ -22,8 +22,7 @@ int find_car_index(const char* identifier) {
 }
 
 void print_race_state() {
-    size_t i;
-    for (i = 0; i < race_size; i++) {
+    for (size_t i = 0; i < race_size; i++) {
         printf("Car %s: %u laps\n", race[i].identifier, race[i].laps);
     }
 }
@@ -41,7 +40,6 @@ void race_state(const char* identifier) {
     }
 }
 
-/* This function demonstrates the usage of race_state */
 void update_race() {
     race_state("car1");
     race_state("car2");
