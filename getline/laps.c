@@ -13,7 +13,8 @@ Car race[MAX_CARS];
 size_t race_size = 0;
 
 int find_car_index(const char* identifier) {
-    for (size_t i = 0; i < race_size; i++) {
+    size_t i;  // Declare 'i' outside the loop
+    for (i = 0; i < race_size; i++) {
         if (strcmp(race[i].identifier, identifier) == 0) {
             return i;
         }
@@ -22,7 +23,8 @@ int find_car_index(const char* identifier) {
 }
 
 void print_race_state() {
-    for (size_t i = 0; i < race_size; i++) {
+    size_t i;  // Declare 'i' outside the loop
+    for (i = 0; i < race_size; i++) {
         printf("Car %s: %u laps\n", race[i].identifier, race[i].laps);
     }
 }
