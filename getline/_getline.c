@@ -5,7 +5,7 @@
 
 /* Assuming this is part of a larger code file */
 
-ssize_t _getline(char **line, size_t *len, FILE *stream) {
+char *_getline(const int fd) {
     /* Declare all variables at the beginning */
     static char *static_buffer = NULL;
     static size_t static_buffer_len = 0;
