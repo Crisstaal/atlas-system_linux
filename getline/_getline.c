@@ -8,6 +8,7 @@ char *_getline(int fd) {
     static char *static_buffer = NULL;
     static size_t buffer_capacity = 0;
     static size_t buffer_length = 0;
+    size_t line_len = 0;
     size_t remaining_len = buffer_length - (line_len + 1);
     char *new_buffer = realloc(static_buffer, buffer_capacity);
     ssize_t bytes_read = read(fd, static_buffer + buffer_length, buffer_capacity - buffer_length);
