@@ -29,6 +29,24 @@ void add_car(int id) {
     printf("Car %d joined the race\n", id);
 }
 
+void bubble_sort_cars(Car* cars, size_t count) {
+    int swapped;
+    for (size_t i = 0; i < count - 1; i++) {
+        swapped = 0;
+        for (size_t j = 0; j < count - 1 - i; j++) {
+            if (cars[j].id > cars[j + 1].id) {
+                Car temp = cars[j];
+                cars[j] = cars[j + 1];
+                cars[j + 1] = temp;
+                swapped = 1;
+            }
+        }
+        if (!swapped) {
+            break; // No swap means the array is sorted
+        }
+    }
+}
+
 void race_state(int *ids, size_t size) {
     size_t i = 0;
     if (size == 0) {
@@ -49,7 +67,7 @@ void race_state(int *ids, size_t size) {
         }
     }
 
-    qsort(race, race_size, sizeof(Car), compare_cars);
+ bubble_sort_cars(race, race_size);
 
     /**Print the state of the race*/
     printf("Race state:\n");
@@ -58,8 +76,15 @@ void race_state(int *ids, size_t size) {
     }
 }
 
-int compare_cars(const void* a, const void* b) {
-    const Car* carA = (const Car*)a;
-    const Car* carB = (const Car*)b;
-    return carA->id - carB->id;
+int main() {
+    int ids1[] = {1, 3, 2}; // Cars joining the race
+    race_state(ids1, 3); // Update and print the race state
+
+    int ids2[] = {2, 1}; // More laps for existing cars
+    race_state(ids2, 2); // Update and print the race state
+
+    int ids3[] = {}; // End of the race
+    race_state(ids3, 0); // Clear the race
+
+    return 0;
 }
