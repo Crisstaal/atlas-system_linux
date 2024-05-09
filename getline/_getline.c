@@ -46,7 +46,7 @@ char *_getline(int fd) {
             memcpy(line, buffer, line_len);
             line[line_len] = '\0'; 
 
-            memmove(static_buffer, newline_pos + 1, remaining_len); 
+            memmove(buffer, newline_pos + 1, remaining_len); 
             buffer_length = remaining_len;
             return line;
         }
@@ -58,7 +58,7 @@ char *_getline(int fd) {
                 return NULL;
             }
             buffer = new_buffer;
-              memset(static_buffer + buffer_length, 0xFF, buffer_capacity - buffer_length);
+              memset(buffer + buffer_length, 0xFF, buffer_capacity - buffer_length);
         }
 
         if (bytes_read <= 0) {
