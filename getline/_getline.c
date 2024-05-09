@@ -8,6 +8,9 @@ char *_getline(int fd) {
     static char *static_buffer = NULL;
     static size_t buffer_capacity = 0;
     static size_t buffer_length = 0;
+    size_t remaining_len = buffer_length - (line_len + 1);
+    char *new_buffer = realloc(static_buffer, buffer_capacity);
+    ssize_t bytes_read = read(fd, static_buffer + buffer_length, buffer_capacity - buffer_length);
 
     /*Initialize the static buffer if it's NULL*/
     if (static_buffer == NULL) {
@@ -29,7 +32,6 @@ char *_getline(int fd) {
             
             strncpy(line, static_buffer, line_len); 
             line[line_len] = '\0';
-            size_t remaining_len = buffer_length - (line_len + 1);
             memmove(static_buffer, newline_pos + 1, remaining_len); 
             buffer_length = remaining_len;
             return line;
@@ -38,14 +40,12 @@ char *_getline(int fd) {
    
         if (buffer_length == buffer_capacity) {
             buffer_capacity *= 2;
-            char *new_buffer = realloc(static_buffer, buffer_capacity);
             if (new_buffer == NULL) {
                 return NULL;
             }
             static_buffer = new_buffer;
         }
 
-        ssize_t bytes_read = read(fd, static_buffer + buffer_length, buffer_capacity - buffer_length);
         if (bytes_read <= 0) {
             return NULL;
         }
