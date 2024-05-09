@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define READ_SIZE 128
 
 char *_getline(int fd) {
     static char *static_buffer = NULL;
