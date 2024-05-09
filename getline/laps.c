@@ -4,10 +4,6 @@
 
 #define MAX_CARS 10
 
-typedef struct {
-    char identifier[10];
-    unsigned int laps;
-} Car;
 
 Car race[MAX_CARS];
 size_t race_size = 0;
