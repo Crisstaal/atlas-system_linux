@@ -1,49 +1,63 @@
-#include "laps.h"
-#include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "laps.h" 
 
-#define MAX_CARS 10
-
-void race_state(int *id, size_t size) {
-Car race[MAX_CARS];
+Car* race = NULL;
 size_t race_size = 0;
 
-int find_car_index(const char* identifier) {
-    /* Declare 'i' outside the loop */
-    size_t i; 
-    for (i = 0; i < race_size; i++) {
-        if (strcmp(race[i].identifier, identifier) == 0) {
-            return i;
+Car* find_car(int id) {
+    for (size_t i = 0; i < race_size; i++) {
+        if (race[i].id == id) {
+            return &race[i];
         }
     }
-    return -1;
+    return NULL;
 }
 
-void print_race_state() {
-    /* Declare 'i' outside the loop */
-    size_t i;
-    for (i = 0; i < race_size; i++) {
-        printf("Car %s: %u laps\n", race[i].identifier, race[i].laps);
+void add_car(int id) {
+    race = realloc(race, (race_size + 1) * sizeof(Car));
+    if (!race) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    race[race_size].id = id;
+    race[race_size].laps = 0;
+    race_size++;
+
+    printf("Car %d joined the race\n", id);
+}
+
+void race_state(int *ids, size_t size) {
+    if (size == 0) {
+        free(race);
+        race = NULL; 
+        race_size = 0;
+        return;
+    }
+
+    for (size_t i = 0; i < size; i++) {
+        int id = ids[i];
+        Car* car = find_car(id);
+
+        if (!car) {
+            add_car(id);
+        } else {
+            car->laps++;
+        }
+    }
+
+    qsort(race, race_size, sizeof(Car), compare_cars);
+
+    /**Print the state of the race*/
+    printf("Race state:\n");
+    for (size_t i = 0; i < race_size; i++) {
+        printf("Car %d [%d laps]\n", race[i].id, race[i].laps);
     }
 }
 
-void race_state(const char* identifier) {
-    int car_index = find_car_index(identifier);
-    if (car_index == -1) {
-        /* If the car doesn't exist, add it to the race */
-        strcpy(race[race_size].identifier, identifier);
-        race[race_size].laps = 1;
-        race_size++;
-    } else {
-        /* If the car exists, increment its lap count */
-        race[car_index].laps++;
-    }
-}
-void update_race() {
-    race_state("car1");
-    race_state("car2");
-    race_state("car1");
-    print_race_state();
-}
-
+int compare_cars(const void* a, const void* b) {
+    const Car* carA = (const Car*)a;
+    const Car* carB = (const Car*)b;
+    return carA->id - carB->id;
 }
