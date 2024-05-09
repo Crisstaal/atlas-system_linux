@@ -4,7 +4,7 @@
 
 #define MAX_CARS 10
 
-
+void race_state(int *id, size_t size) {
 Car race[MAX_CARS];
 size_t race_size = 0;
 
@@ -39,7 +39,6 @@ void race_state(const char* identifier) {
         race[car_index].laps++;
     }
 }
-
 void update_race() {
     race_state("car1");
     race_state("car2");
@@ -47,10 +46,4 @@ void update_race() {
     print_race_state();
 }
 
-int main() {
-    const char* ids[] = {"car1", "car2"};
-
-    race_state(ids[0]);  
-    race_state(ids[1]);  
 }
-
