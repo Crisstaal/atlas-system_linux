@@ -44,7 +44,7 @@ void bubble_sort_cars(Car* cars, size_t count) {
             }
         }
         if (!swapped) {
-            break; // No swap means the array is sorted
+            break;
         }
     }
 }
