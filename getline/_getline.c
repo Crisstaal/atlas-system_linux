@@ -6,7 +6,7 @@
 
 
 char *_getline(int fd) {
-    static char *static_buffer = NULL;
+    static char *buffer = NULL;
     static size_t buffer_capacity = 0;
     static size_t buffer_length = 0;
     size_t line_len = 0;
@@ -19,26 +19,32 @@ char *_getline(int fd) {
     }
 
     /*Initialize the static buffer if it's NULL*/
-    if (static_buffer == NULL) {
-        buffer_capacity = 128;
-        static_buffer = malloc(buffer_capacity);
-        if (static_buffer == NULL) {
+    if (buffer == NULL) {
+       buffer = (char *)malloc(buffer_capacity);
+        if (buffer == NULL) {
             return NULL;
         }
-        memset(static_buffer, 0xFF, buffer_capacity);
+        buffer_length = 0;
     }
 
     while (1) {
-        char *newline_pos = strchr(static_buffer, '\n');
+        
         if (newline_pos) {
-            size_t line_len = newline_pos - static_buffer;
-            char *line = malloc(line_len + 1);
+             size_t newline_pos = 0;
+        while (newline_pos < buffer_length && buffer[newline_pos] != '\n') {
+            newline_pos++;
+        }
+
+        if (newline_pos < buffer_length) {
+            size_t line_len = newline_pos;
+            char *line = (char *)malloc(line_len + 1);
             if (line == NULL) {
-                return NULL; 
+                return NULL;
             }
-            
-            strncpy(line, static_buffer, line_len); 
-            line[line_len] = '\0';
+
+            /*Copy the line to the new memory*/
+            memcpy(line, buffer, line_len);
+            line[line_len] = '\0'; 
 
             memmove(static_buffer, newline_pos + 1, remaining_len); 
             buffer_length = remaining_len;
@@ -51,7 +57,7 @@ char *_getline(int fd) {
             if (new_buffer == NULL) {
                 return NULL;
             }
-            static_buffer = new_buffer;
+            buffer = new_buffer;
               memset(static_buffer + buffer_length, 0xFF, buffer_capacity - buffer_length);
         }
 
