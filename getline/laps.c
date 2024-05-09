@@ -6,7 +6,8 @@ Car* race = NULL;
 size_t race_size = 0;
 
 Car* find_car(int id) {
-    for (size_t i = 0; i < race_size; i++) {
+    size_t = i =0;
+    for (i < race_size; i++) {
         if (race[i].id == id) {
             return &race[i];
         }
@@ -29,6 +30,7 @@ void add_car(int id) {
 }
 
 void race_state(int *ids, size_t size) {
+    size_t i = 0;
     if (size == 0) {
         free(race);
         race = NULL; 
@@ -36,7 +38,7 @@ void race_state(int *ids, size_t size) {
         return;
     }
 
-    for (size_t i = 0; i < size; i++) {
+    for (i < size; i++) {
         int id = ids[i];
         Car* car = find_car(id);
 
@@ -51,7 +53,7 @@ void race_state(int *ids, size_t size) {
 
     /**Print the state of the race*/
     printf("Race state:\n");
-    for (size_t i = 0; i < race_size; i++) {
+    for (i < race_size; i++) {
         printf("Car %d [%d laps]\n", race[i].id, race[i].laps);
     }
 }
