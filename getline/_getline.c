@@ -9,6 +9,7 @@
 char *_getline(int fd) {
     static char *static_buffer = NULL;
     static size_t static_buffer_len = 0;
+    
     size_t line_len = 0;
     ssize_t bytes_read = 0;
     char *newline_pos = NULL;
