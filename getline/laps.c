@@ -31,9 +31,11 @@ void add_car(int id) {
 
 void bubble_sort_cars(Car* cars, size_t count) {
     int swapped;
-    for (size_t i = 0; i < count - 1; i++) {
+    size_t i = 0;
+    size_t j = 0;
+    for (;i < count - 1; i++) {
         swapped = 0;
-        for (size_t j = 0; j < count - 1 - i; j++) {
+        for (;j < count - 1 - i; j++) {
             if (cars[j].id > cars[j + 1].id) {
                 Car temp = cars[j];
                 cars[j] = cars[j + 1];
@@ -74,17 +76,4 @@ void race_state(int *ids, size_t size) {
     for (;i < race_size; i++) {
         printf("Car %d [%d laps]\n", race[i].id, race[i].laps);
     }
-}
-
-int main() {
-    int ids1[] = {1, 3, 2}; // Cars joining the race
-    race_state(ids1, 3); // Update and print the race state
-
-    int ids2[] = {2, 1}; // More laps for existing cars
-    race_state(ids2, 2); // Update and print the race state
-
-    int ids3[] = {}; // End of the race
-    race_state(ids3, 0); // Clear the race
-
-    return 0;
 }
