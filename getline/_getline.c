@@ -1,70 +1,92 @@
 #include <stdio.h>
 #include "_getline.h"
-#include <unistd.h>
-#include <stdlib.h>
 #include <string.h>
 
+#define OPEN_MAX 255
+static filebuf_t fds[OPEN_MAX];
 
+/**
+ * _fgetchar - getchar
+ * @fd: file dscriptor
+ * Return: value of char read or -1 on EOF
+ */
+ssize_t _fgetchar(const int fd)
+{
+	filebuf_t *fb;
+	int i;
+
+	if (fd == -1)
+	{
+		for (i = 3; i < OPEN_MAX; ++i)
+		{
+			fb = &fds[i];
+			if (fb->been_opened)
+			{
+				dbg_printf(BLUE "%d had been opened. zeroing out now..\n" RESET, i);
+				memset(fb, 0, sizeof(*fb));
+				dbg_printf(RED "buf contents: %s\n" RESET, fb->buf);
+			}
+		}
+		return (EOF);
+    }
+    
+	fb = &fds[fd];
+	fb->been_opened = 1;
+	if (fb->n == 0)
+	{
+		fb->n = read(fd, fb->buf, READ_SIZE);
+		fb->bufp = fb->buf;
+	}
+	return ((--fb->n >= 0) ? (unsigned char)*(fb->bufp)++ : EOF);
+}
+
+/**
+ * _getline - get line
+ * @fd: file descriptor
+ * Return: NULL on error or EOF
+ */
 char *_getline(int fd) {
-    static char *buffer = NULL;
-    static size_t buffer_capacity = 0;
-    static size_t buffer_length = 0;
-    size_t line_len = 0;
-    size_t remaining_len = buffer_length - (line_len + 1);
-    char *new_buffer = realloc(static_buffer, buffer_capacity);
-    ssize_t bytes_read = read(fd, static_buffer + buffer_length, buffer_capacity - buffer_length);
+   char *buf, 
+   char *ptr, 
+   char *endptr, c;
 
-    if (fd < 0) {
-        return NULL;
-    }
+	if (fd == -1)
+	{
+		_fgetchar(-1);
+		return (NULL);
+	}
+	else
+	{
+		buf = malloc(LINEBUF_SIZE);
+		if (buf == NULL)
+			return (NULL);
+		ptr = buf;
+		endptr = ptr + LINEBUF_SIZE;
+		while ((c = _fgetchar(fd)) >= 0)
+		{
+			*ptr++ = c;
+			if (c == '\n')
+			{
+				*(--ptr) = '\0';
+				return (buf);
+			}
+			if (ptr == endptr)
+			{
+				long int diff = endptr - buf;
 
-    /*Initialize the static buffer if it's NULL*/
-    if (buffer == NULL) {
-       buffer = (char *)malloc(buffer_capacity);
-        if (buffer == NULL) {
-            return NULL;
-        }
-        buffer_length = 0;
-    }
-
-    while (1) {
-        
-        if (newline_pos) {
-             size_t newline_pos = 0;
-        while (newline_pos < buffer_length && buffer[newline_pos] != '\n') {
-            newline_pos++;
-        }
-
-        if (newline_pos < buffer_length) {
-            size_t line_len = newline_pos;
-            char *line = (char *)malloc(line_len + 1);
-            if (line == NULL) {
-                return NULL;
-            }
-
-            /*Copy the line to the new memory*/
-            memcpy(line, buffer, line_len);
-            line[line_len] = '\0'; 
-
-            memmove(buffer, newline_pos + 1, remaining_len); 
-            buffer_length = remaining_len;
-            return line;
-        }
-        
-   
-        if (buffer_length >= buffer_capacity) {
-            buffer_capacity *= 2;
-            if (new_buffer == NULL) {
-                return NULL;
-            }
-            buffer = new_buffer;
-              memset(buffer + buffer_length, 0xFF, buffer_capacity - buffer_length);
-        }
-
-        if (bytes_read <= 0) {
-            return NULL;
-        }
-        
-        buffer_length += bytes_read;
-    }
+				dbg_printf(BLUE "old size of buf: %ld\n" RESET, diff);
+				buf = realloc(buf, diff + LINEBUF_SIZE);
+				ptr = buf + diff;
+				endptr = ptr + LINEBUF_SIZE;
+			}
+		}
+		if (ptr - buf != 0)
+			*ptr = '\0';
+		else
+		{
+			free(buf);
+			return (NULL);
+		}
+	}
+	return (buf);
 }
