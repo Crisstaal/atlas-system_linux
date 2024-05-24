@@ -3,12 +3,10 @@
 #include "laps.h" 
 
 /**
- * add_car - adds a car to list
- * @head: pointer to head node
- * @id: the car id to add
- */
-
-
+* add_car - adds a car to list
+* @head: pointer to head node
+* @id: the car id to add
+*/
 
 void add_car(Car **head, int id)
 {
@@ -18,7 +16,7 @@ void add_car(Car **head, int id)
 	{
 		node = malloc(sizeof(Car));
 		if (!node)
-			exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 		node->id = id;
 		node->laps = 0;
 		node->next = *head;
@@ -44,7 +42,8 @@ void add_car(Car **head, int id)
 }
 
 
-void race_state(int *id, size_t size) {
+void race_state(int *id, size_t size)
+{
 	static Car *head;
 	Car *node;
 	size_t i;
