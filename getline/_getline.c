@@ -26,7 +26,7 @@ ssize_t _fgetchar(const int fd)
             fb = &fd_array[i];
             if (fb->been_opened)
             {
-                printf("%d had been opened. Zeroing out now..\n", i); // Change dbg_printf to printf for simplicity
+                printf("%d had been opened. Zeroing out now..\n", i);
                 memset(fb, 0, sizeof(filebuf_t));
                 printf("Buffer contents: %s\n", fb->buf);
             }
@@ -34,7 +34,6 @@ ssize_t _fgetchar(const int fd)
         return EOF;
     }
 
-    // Otherwise, operate on the specified file descriptor
     fb = &fd_array[fd];
     fb->been_opened = 1;
     if (fb->n == 0) {
@@ -42,7 +41,6 @@ ssize_t _fgetchar(const int fd)
         fb->bufp = fb->buf;
     }
 
-    // Return character from buffer
     return (--fb->n >= 0) ? (unsigned char)*(fb->bufp)++ : EOF;
 }
 /**
