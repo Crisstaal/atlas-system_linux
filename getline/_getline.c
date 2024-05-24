@@ -29,7 +29,7 @@ ssize_t _fgetchar(const int fd)
 		return (EOF);
     }
     
-	fb = &fds[fd];
+	fb = &fd[fd];
 	fb->been_opened = 1;
 	if (fb->n == 0)
 	{
