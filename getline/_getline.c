@@ -18,7 +18,7 @@ ssize_t _fgetchar(const int fd)
 	{
 		for (i = 3; i < OPEN_MAX; ++i)
 		{
-			fb = &fds[i];
+			fb = &fd[i];
 			if (fb->been_opened)
 			{
 				dbg_printf(BLUE "%d had been opened. zeroing out now..\n" RESET, i);
@@ -76,7 +76,7 @@ char *_getline(int fd) {
 
 				dbg_printf(BLUE "old size of buf: %ld\n" RESET, diff);
 				buf = realloc(buf, diff + LINEBUF_SIZE);
-				if (buff == NULL)
+				if (buf == NULL)
 				return NULL;
 				ptr = buf + diff;
 				endptr = ptr + LINEBUF_SIZE;
