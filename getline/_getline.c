@@ -13,15 +13,15 @@ filebuf_t fd_array[OPEN_MAX];
 ssize_t _fgetchar(const int fd)
 {
     filebuf_t *fb;
+	int i;
 
-    // Check if fd is within valid range
     if (fd < 0 || fd >= OPEN_MAX) {
-        return EOF; // Return EOF for invalid fd
+        return EOF;
     }
 	
     if (fd == -1)
     {
-        for (int i = 3; i < OPEN_MAX; ++i)
+        for (i = 3; i < OPEN_MAX; ++i)
         {
             fb = &fd_array[i];
             if (fb->been_opened)
