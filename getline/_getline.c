@@ -78,7 +78,7 @@ char *_getline(int fd) {
 			{
 				long int diff = endptr - buf;
 
-				dbg_printf(BLUE "old size of buf: %ld\n" RESET, diff);
+				printf(BLUE "old size of buf: %ld\n" RESET, diff);
 				buf = realloc(buf, diff + LINEBUF_SIZE);
 				if (buf == NULL)
 				return NULL;
