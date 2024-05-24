@@ -14,7 +14,6 @@
 typedef struct Car{
     int id;
     size_t laps;
-    struct Car *laps;
 	struct Car *next;
  }Car;
 

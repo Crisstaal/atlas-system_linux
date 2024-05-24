@@ -44,7 +44,7 @@ void add_car(Car **head, int id)
 }
 
 
-void race_state(int *ids, size_t size) {
+void race_state(int *id, size_t size) {
 	static Car *head;
 	Car *node;
 	size_t i;
