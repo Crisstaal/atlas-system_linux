@@ -8,9 +8,14 @@
  * @id: the car id to add
  */
 
+ typedef struct Car {
+	int id;
+	struct Car *next;
+ }Car;
+
 void add_car(Car **head, int id)
 {
-	Car *node, *next, *temp;
+	Car *node, *temp;
 
 	if (!*head || id < (*head)->id)
 	{
