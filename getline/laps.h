@@ -11,12 +11,14 @@
  * @next: next node in list
  */
 
-typedef struct Car{
+typedef struct Car
+{
     int id;
     size_t laps;
-	struct Car *next;
- }Car;
+    struct Car *next;
+ } Car;
 
 /* Function prototypes*/
 void race_state(int *id, size_t size);
+
 #endif

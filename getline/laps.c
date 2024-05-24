@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "laps.h" 
+#include "laps.h"
 
 /**
 * add_car - adds a car to list
