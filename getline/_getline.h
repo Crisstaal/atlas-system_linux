@@ -20,7 +20,7 @@ typedef struct {
     ssize_t n;
 } filebuf_t;
 
-static filebuf_t fds[OPEN_MAX];
+
 void dbg_printf(const char *format, ...);
 
 ssize_t _fgetchar(const int fd);

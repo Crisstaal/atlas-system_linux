@@ -45,9 +45,10 @@ ssize_t _fgetchar(const int fd)
  * Return: NULL on error or EOF
  */
 char *_getline(int fd) {
-   char *buf, 
-   char *ptr, 
-   char *endptr, c;
+   char *buf;
+   char *ptr;
+   char *endptr;
+   char c;
 
 	if (fd == -1)
 	{
