@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+filebuf_t fd_array[OPEN_MAX];
 /**
  * _fgetchar - getchar
  * @fd: file dscriptor

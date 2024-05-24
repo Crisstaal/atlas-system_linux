@@ -23,7 +23,17 @@ typedef struct {
 
 void dbg_printf(const char *format, ...);
 
+/**
+ * _fgetchar - Reads a character from a file descriptor.
+ * @fd: File descriptor
+ * Return: Character read or EOF on error or end-of-file.
+ */
 ssize_t _fgetchar(const int fd);
+/**
+ * _getline - Reads a line from a file descriptor.
+ * @fd: File descriptor to read from.
+ * Return: Pointer to a buffer containing the read line, or NULL on error or end-of-file.
+ */
 char *_getline(const int fd);
 
 
