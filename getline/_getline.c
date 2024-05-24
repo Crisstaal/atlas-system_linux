@@ -22,22 +22,22 @@ ssize_t _fgetchar(const int fd)
 			fb = &fd[i];
 			if (fb->been_opened)
 			{
-				dbg_printf(BLUE "%d had been opened. zeroing out now..\n" RESET, i);
+				dbg_printf(BLUE "%d had been opened. Zeroing out now..\n" RESET, i);
 				memset(fb, 0, sizeof(*fb));
-				dbg_printf(RED "buf contents: %s\n" RESET, fb->buf);
+				dbg_printf(RED "Buffer contents: %s\n" RESET, fb->buf);
 			}
 		}
 		return (EOF);
     }
-    
-	fb = &fd[fd];
-	fb->been_opened = 1;
-	if (fb->n == 0)
-	{
-		fb->n = read(fd, fb->buf, READ_SIZE);
-		fb->bufp = fb->buf;
-	}
-	return ((--fb->n >= 0) ? (unsigned char)*(fb->bufp)++ : EOF);
+	
+filebuf_t *fb = &fd_array[fd];
+fb->been_opened = 1;
+if (fb->n == 0)
+{
+    fb->n = read(fd, fb->buf, READ_SIZE);
+    fb->bufp = fb->buf;
+}
+return (--fb->n >= 0) ? (unsigned char)*(fb->bufp)++ : EOF;
 }
 
 /**
