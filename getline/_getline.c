@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include "_getline.h"
 #include <string.h>
-
-#define OPEN_MAX 255
-static filebuf_t fds[OPEN_MAX];
+#include <stdlib.h>
+#include <unistd.h>
 
 /**
  * _fgetchar - getchar
@@ -76,6 +75,8 @@ char *_getline(int fd) {
 
 				dbg_printf(BLUE "old size of buf: %ld\n" RESET, diff);
 				buf = realloc(buf, diff + LINEBUF_SIZE);
+				if (buff == NULL)
+				return NULL;
 				ptr = buf + diff;
 				endptr = ptr + LINEBUF_SIZE;
 			}
