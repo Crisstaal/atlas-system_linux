@@ -10,7 +10,7 @@
 
 void add_car(Car **head, int id)
 {
-	Car *node, *temp;
+	Car *node, *next, *temp;
 
 	if (!*head || id < (*head)->id)
 	{
