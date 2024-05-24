@@ -5,7 +5,7 @@
 
 void ls(const char *dir){
     struct dirent *d;
-    dir *dirp =    opendir();
+    dir *dirp =    opendir(dir);
     if (!dir) {
         perror("Unable to read directory");
         exit(EXIT_FAILURE);

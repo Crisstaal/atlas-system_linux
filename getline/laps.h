@@ -1,7 +1,7 @@
 #ifndef LAPS_H
 #define LAPS_H
 
-#include <stdlib.>
+#include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
 /**
