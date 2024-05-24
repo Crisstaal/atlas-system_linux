@@ -12,34 +12,39 @@ filebuf_t fd_array[OPEN_MAX];
  */
 ssize_t _fgetchar(const int fd)
 {
-	filebuf_t *fb;
-	int i;
+    filebuf_t *fb;
 
-	if (fd == -1)
-	{
-		for (i = 3; i < OPEN_MAX; ++i)
-		{
-			fb = &fd[i];
-			if (fb->been_opened)
-			{
-				dbg_printf(BLUE "%d had been opened. Zeroing out now..\n" RESET, i);
-				memset(fb, 0, sizeof(*fb));
-				dbg_printf(RED "Buffer contents: %s\n" RESET, fb->buf);
-			}
-		}
-		return (EOF);
+    // Check if fd is within valid range
+    if (fd < 0 || fd >= OPEN_MAX) {
+        return EOF; // Return EOF for invalid fd
     }
 	
-filebuf_t *fb = &fd_array[fd];
-fb->been_opened = 1;
-if (fb->n == 0)
-{
-    fb->n = read(fd, fb->buf, READ_SIZE);
-    fb->bufp = fb->buf;
-}
-return (--fb->n >= 0) ? (unsigned char)*(fb->bufp)++ : EOF;
-}
+    if (fd == -1)
+    {
+        for (int i = 3; i < OPEN_MAX; ++i)
+        {
+            fb = &fd_array[i];
+            if (fb->been_opened)
+            {
+                printf("%d had been opened. Zeroing out now..\n", i); // Change dbg_printf to printf for simplicity
+                memset(fb, 0, sizeof(filebuf_t));
+                printf("Buffer contents: %s\n", fb->buf);
+            }
+        }
+        return EOF;
+    }
 
+    // Otherwise, operate on the specified file descriptor
+    fb = &fd_array[fd];
+    fb->been_opened = 1;
+    if (fb->n == 0) {
+        fb->n = read(fd, fb->buf, READ_SIZE);
+        fb->bufp = fb->buf;
+    }
+
+    // Return character from buffer
+    return (--fb->n >= 0) ? (unsigned char)*(fb->bufp)++ : EOF;
+}
 /**
  * _getline - get line
  * @fd: file descriptor
