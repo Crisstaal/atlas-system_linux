@@ -39,10 +39,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
     path[dir_len + 1] = '\0';
 
     while ((d = readdir(dh)) != NULL) {
-        int my_strcmp(const char *s1, const char *s2) {
-            return strcmp(s1, s2);
-        }
-        if ((!op_A && d->d_name[0] == '.') || (op_A && (strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0))) continue;
+        if ((!op_A && d->d_name[0] == '.') || (op_A && (my_strcmp(d->d_name, ".") == 0 || my_strcmp(d->d_name, "..") == 0))) continue;
 
         new_file = malloc(sizeof(File));
         if (new_file == NULL) {
