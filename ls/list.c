@@ -18,7 +18,6 @@ void list_directory(const char *dir, int op_l, int op_A) {
     File *new_file;
     size_t j, len, dir_len;
     File **file_array = NULL;
-    int my_strcmp(const char *s1, const char *s2);
     
     if (!dh) {
         fprintf(stderr, "hls: cannot open directory '%s': %s\n", dir, strerror(errno));
@@ -40,6 +39,9 @@ void list_directory(const char *dir, int op_l, int op_A) {
     path[dir_len + 1] = '\0';
 
     while ((d = readdir(dh)) != NULL) {
+        int my_strcmp(const char *s1, const char *s2) {
+            return strcmp(s1, s2);
+        }
         if ((!op_A && d->d_name[0] == '.') || (op_A && (strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0))) continue;
 
         new_file = malloc(sizeof(File));
