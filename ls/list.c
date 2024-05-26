@@ -11,8 +11,12 @@ void list_directory(const char *dir, int op_l, int op_A) {
     DIR *dh = opendir(dir);
     int i;
     File *head = NULL, *tail = NULL;
-    int file_count = 0;
-
+    int file_count = 0;  char path[512];
+    File *new_file = malloc(sizeof(File));
+    File *f;
+    File **file_array;
+    File *temp = head;
+    
     if (!dh) {
         fprintf(stderr, "hls: cannot open directory '%s': %s\n", dir, strerror(errno));
         exit(EXIT_FAILURE);
@@ -21,9 +25,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
     while ((d = readdir(dh)) != NULL) {
         if ((!op_A && d->d_name[0] == '.') || (op_A && (strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0))) continue;
         
-        File *new_file = malloc(sizeof(File));
         strcpy(new_file->name, d->d_name);
-        char path[512];
         snprintf(path, sizeof(path), "%s/%s", dir, d->d_name);
         stat(path, &new_file->st);
         new_file->next = NULL;
@@ -36,7 +38,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
 
 
 
-    for (File *f = head; f != NULL; f = f->next) file_count++;
+    for (f= head; f != NULL; f = f->next) file_count++;
 
     File **file_array = malloc(file_count * sizeof(File *));
     File *temp = head;
