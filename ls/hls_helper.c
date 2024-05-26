@@ -45,3 +45,6 @@ void print_file_details(File *file) {
     printf("%s %lu %s %s %5ld %s %s\n", mode, st.st_nlink, pw->pw_name, gr->gr_name, (long)st.st_size, timebuf, file->name);
 
 }
+int my_strcmp(const char *s1, const char *s2) {
+            return strcmp(s1, s2);
+            }
