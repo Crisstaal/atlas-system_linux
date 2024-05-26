@@ -15,7 +15,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
     char path[512];
     File *f = head;
     File *new_file;
-    size_t j, len;
+    size_t j, len, dir_len;
     File **file_array = NULL;
     
     if (!dh) {
@@ -23,7 +23,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
         exit(EXIT_FAILURE);
     }
 
-     size_t dir_len = strlen(dir);
+    dir_len = strlen(dir);
     if (dir_len >= sizeof(path) - 2) {
         fprintf(stderr, "Directory path too long\n");
         exit(EXIT_FAILURE);
