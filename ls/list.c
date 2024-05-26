@@ -20,7 +20,8 @@ void list_directory(const char *dir, int op_l, int op_A) {
     File **file_array = NULL;
     
     if (!dh) {
-        fprintf(stderr, "hls: cannot open directory '%s': %s\n", dir, strerror(errno));
+        fprintf(stderr, "hls: cannot open directory '%s': ", dir);
+        
         exit(EXIT_FAILURE);
     }
     
