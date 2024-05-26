@@ -18,6 +18,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
     File *new_file;
     size_t j, len, dir_len;
     File **file_array = NULL;
+    int my_strcmp(const char *s1, const char *s2);
     
     if (!dh) {
         fprintf(stderr, "hls: cannot open directory '%s': %s\n", dir, strerror(errno));
