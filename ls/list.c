@@ -9,12 +9,15 @@
 void list_directory(const char *dir, int op_l, int op_A) {
     struct dirent *d;
     DIR *dh = opendir(dir);
+    int i;
+    File *head = NULL, *tail = NULL;
+    int file_count = 0;
+
     if (!dh) {
         fprintf(stderr, "hls: cannot open directory '%s': %s\n", dir, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    File *head = NULL, *tail = NULL;
     while ((d = readdir(dh)) != NULL) {
         if ((!op_A && d->d_name[0] == '.') || (op_A && (strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0))) continue;
         
@@ -31,19 +34,20 @@ void list_directory(const char *dir, int op_l, int op_A) {
     }
     closedir(dh);
 
-    int file_count = 0;
+
+
     for (File *f = head; f != NULL; f = f->next) file_count++;
 
     File **file_array = malloc(file_count * sizeof(File *));
     File *temp = head;
-    for (int i = 0; i < file_count; i++) {
+    for (i = 0; i < file_count; i++) {
         file_array[i] = temp;
         temp = temp->next;
     }
 
     qsort(file_array, file_count, sizeof(File *), compare_names);
 
-    for (int i = 0; i < file_count; i++) {
+    for (i = 0; i < file_count; i++) {
         if (op_l) {
             print_file_details(file_array[i]);
         } else {

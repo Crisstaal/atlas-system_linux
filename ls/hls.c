@@ -6,9 +6,11 @@
 int main(int argc, char *argv[]) {
     int op_l = 0, op_A = 0;
     const char *dir = ".";
+    int i;
+    int start = 1;
 
     /*Parse command line arguments*/
-    for (int i = 1; i < argc; i++) {
+    for (i = 1; i < argc; i++) {
         if (argv[i][0] == '-') {
             const char *p = argv[i] + 1;
             while (*p) {
@@ -26,7 +28,6 @@ int main(int argc, char *argv[]) {
     }
 
     /* Handle multiple directories or files*/
-    int start = 1;
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] != '-') {
             if (start) start = 0;
