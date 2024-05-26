@@ -15,7 +15,8 @@ void list_directory(const char *dir, int op_l, int op_A) {
     char path[512];
     File *f = head;
     File *new_file;
-    size_t j;
+    size_t j, len;
+    File **file_array = malloc(file_count * sizeof(File *));
     
     if (!dh) {
         fprintf(stderr, "hls: cannot open directory '%s': %s\n", dir, strerror(errno));
@@ -37,7 +38,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
         }
         new_file->name[j] = '\0';
 
-        size_t len = strlen(dir);
+        len = strlen(dir);
         strncpy(path, dir, sizeof(path) - 1);
         path[len] = '/';
         strncpy(path + len + 1, d->d_name, sizeof(path) - len - 1);
@@ -61,7 +62,6 @@ void list_directory(const char *dir, int op_l, int op_A) {
         f = f->next;
     }
 
-    File **file_array = malloc(file_count * sizeof(File *));
     if (file_array == NULL) {
         perror("malloc");
         exit(EXIT_FAILURE);
