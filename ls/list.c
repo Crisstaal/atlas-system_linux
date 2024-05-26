@@ -23,8 +23,12 @@ void list_directory(const char *dir, int op_l, int op_A) {
         fprintf(stderr, "hls: cannot open directory '%s': %s\n", dir, strerror(errno));
         exit(EXIT_FAILURE);
     }
+    
+    while (dir[dir_len] != '\0')
+    {
+        dir_len++;
+    }
 
-    dir_len = strlen(dir);
     if (dir_len >= sizeof(path) - 2) {
         fprintf(stderr, "Directory path too long\n");
         exit(EXIT_FAILURE);
@@ -90,7 +94,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
     for (m = 1; m < file_count; ++m) {
         File *key = file_array[m];
         n = m - 1;
-        while (n >= 0 && strcmp(file_array[n]->name, key->name) > 0) {
+        while (n >= 0 && my_strcmp(file_array[n]->name, key->name) > 0) {
             file_array[n + 1] = file_array[n];
             n = n - 1;
         }
