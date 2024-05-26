@@ -30,7 +30,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
         exit(EXIT_FAILURE);
     }
 
-    write(path, dir, dir_len);
+    sprintf(path, dir, dir_len);
     path[dir_len] = '/';
     path[dir_len + 1] = '\0';
 
@@ -57,7 +57,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
             fprintf(stderr, "Path length exceeds buffer size\n");
             exit(EXIT_FAILURE);
         }
-        write(path + dir_len + 1, d->d_name, len + 1);
+        sprintf(path + dir_len + 1, d->d_name, len + 1);
 
         if (lstat(path, &new_file->st) != 0) {
             perror("lstat");
