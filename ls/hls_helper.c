@@ -42,5 +42,6 @@ void print_file_details(File *file) {
     mode[8] = (st.st_mode & S_IWOTH) ? 'w' : '-';
     mode[9] = (st.st_mode & S_IXOTH) ? 'x' : '-';
 
-    printf("%s %lu %s %s %5lld %s %s\n", mode, st.st_nlink, pw->pw_name, gr->gr_name, (long long)st.st_size, timebuf, file->name);
+    printf("%s %lu %s %s %5ld %s %s\n", mode, st.st_nlink, pw->pw_name, gr->gr_name, (long)st.st_size, timebuf, file->name);
+
 }

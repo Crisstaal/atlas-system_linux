@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* Handle multiple directories or files*/
-    for (int i = 1; i < argc; i++) {
+    for (i = 1; i < argc; i++) {
         if (argv[i][0] != '-') {
             if (start) start = 0;
             else printf("\n");
