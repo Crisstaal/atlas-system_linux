@@ -25,8 +25,8 @@ void list_directory(const char *dir, int op_l, int op_A) {
     while ((d = readdir(dh)) != NULL) {
         if ((!op_A && d->d_name[0] == '.') || (op_A && (strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0))) continue;
         
-        strcpy(new_file->name, d->d_name);
-        snprintf(path, sizeof(path), "%s/%s", dir, d->d_name);
+        strncpy(new_file->name, d->d_name);
+        printf(path, sizeof(path), "%s/%s", dir, d->d_name);
         stat(path, &new_file->st);
         new_file->next = NULL;
 
