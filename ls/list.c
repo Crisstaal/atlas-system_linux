@@ -1,18 +1,56 @@
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-#include<dirent.h>
+#include <dirent.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include "hls.h"
 
-void ls(const char *dir){
+void list_directory(const char *dir, int op_l, int op_A) {
     struct dirent *d;
-    dir *dirp =    opendir(dir);
-    if (!dir) {
-        perror("Unable to read directory");
+    DIR *dh = opendir(dir);
+    if (!dh) {
+        fprintf(stderr, "hls: cannot open directory '%s': %s\n", dir, strerror(errno));
         exit(EXIT_FAILURE);
     }
-    while((d = readdir(dir)) !=NULL) {
-        if (d->d_name[0] == '.') continue;
-        printf("%s\n", d->d_name);
+
+    File *head = NULL, *tail = NULL;
+    while ((d = readdir(dh)) != NULL) {
+        if ((!op_A && d->d_name[0] == '.') || (op_A && (strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0))) continue;
+        
+        File *new_file = malloc(sizeof(File));
+        strcpy(new_file->name, d->d_name);
+        char path[512];
+        snprintf(path, sizeof(path), "%s/%s", dir, d->d_name);
+        stat(path, &new_file->st);
+        new_file->next = NULL;
+
+        if (!head) head = new_file;
+        else tail->next = new_file;
+        tail = new_file;
     }
-    closedir(dirp);
+    closedir(dh);
+
+    int file_count = 0;
+    for (File *f = head; f != NULL; f = f->next) file_count++;
+
+    File **file_array = malloc(file_count * sizeof(File *));
+    File *temp = head;
+    for (int i = 0; i < file_count; i++) {
+        file_array[i] = temp;
+        temp = temp->next;
+    }
+
+    qsort(file_array, file_count, sizeof(File *), compare_names);
+
+    for (int i = 0; i < file_count; i++) {
+        if (op_l) {
+            print_file_details(file_array[i]);
+        } else {
+            printf("%s\n", file_array[i]->name);
+        }
+    }
+
+    free(file_array);
+    free_file_list(head);
 }

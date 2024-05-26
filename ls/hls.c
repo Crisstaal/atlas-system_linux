@@ -1,43 +1,44 @@
-#include<dirent.h>
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "hls.h"
 
-int main(int argc, const char *argv[]) {
-    if (argc == 1) {
-      _ls(".", 0,0);
+int main(int argc, char *argv[]) {
+    int op_l = 0, op_A = 0;
+    const char *dir = ".";
+
+    /*Parse command line arguments*/
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            const char *p = argv[i] + 1;
+            while (*p) {
+                if (*p == 'l') op_l = 1;
+                else if (*p == 'A') op_A = 1;
+                else {
+                    fprintf(stderr, "hls: invalid option -- '%c'\n", *p);
+                    exit(EXIT_FAILURE);
+                }
+                p++;
+            }
+        } else {
+            dir = argv[i];
+        }
     }
-    else if(argc == 2) {
-        if (argv[1][0] == '_') {
-            int op_a = 0;
-            int op_l = 0;
-            else if(*p == 'l') op_l =1;
-            else {
-                 perror("Unable to read directory");
-                 exit(EXIT_FAILURE);
-            }
-            p++;
+
+    /* Handle multiple directories or files*/
+    int start = 1;
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] != '-') {
+            if (start) start = 0;
+            else printf("\n");
+            printf("%s:\n", argv[i]);
+            list_directory(argv[i], op_l, op_A);
         }
-    _ls('.', op_a, op_l);
-    } else {/**does the directory exist*/
-_ls(argv[1], 0, 0);
-    } else if (argc ==3) {
-        if(argv[1][0] != '-') {
-            perror("Unable to read directory");
-            exit(EXIT_FAILURE);
-        }
-         int op_a = 0, op_l = 0;
-         char *p = (char *)(argv[1]+[1]);
-         while (*p) {
-            if (*p == 'a') op_a = 1;
-            else if (*P == 'l') op_l =1;
-            else {
-              perror("Unable to read directory");
-              exit(EXIT_FAILURE);
-            }
-            p++;
-        }
-        _ls (argv[2], op_a, op_l);
-         }
-    return (0);
+    }
+
+    if (start) {
+        list_directory(dir, op_l, op_A);
+    }
+
+    return 0;
 }
