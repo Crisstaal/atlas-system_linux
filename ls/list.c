@@ -40,8 +40,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
 
     for (f= head; f != NULL; f = f->next) file_count++;
 
-    File **file_array = malloc(file_count * sizeof(File *));
-    File *temp = head;
+    file_array = malloc(file_count * sizeof(File *));
     for (i = 0; i < file_count; i++) {
         file_array[i] = temp;
         temp = temp->next;
