@@ -71,7 +71,7 @@ void dbg_print_binary(unsigned char r)
  */
 void sort_subentries(file_t **directory, int d_count)
 {
-	_alphasort(dirs, (size_t)d_count);
+	_alphasort(directory, (size_t)d_count);
 }
 
 void _alphasort(file_t **files, int file_count)
