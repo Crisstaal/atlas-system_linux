@@ -24,7 +24,7 @@ void list_dir(const char *path, int include_hidden, int list_long) {
             sprintf(fullpath, "%s/%s", path, entry->d_name);
 
             if (lstat(fullpath, &sb) == -1) {
-                print_error("Error getting file status");
+                printf("Error getting file status");
                 continue;
             }
 
