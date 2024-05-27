@@ -41,9 +41,5 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (start) {
-        list_directory(dir, op_l, op_A);
-    }
-
     return 0;
 }
