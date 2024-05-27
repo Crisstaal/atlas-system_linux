@@ -99,7 +99,7 @@ void parse_opts(char *arg, option_t *options)
         
         for (size_t i = 0; i < sizeof(OptionInfo) / sizeof(OptionInfo[0]); ++i)
         {
-            if (*arg == optionInfo[i].flag)
+            if (*arg == OptionInfo[i].flag)
             {
                 *options |= optionInfo[i].option;
                 dprintf(2, "%s\n" OptionInfo[i].debug_message);

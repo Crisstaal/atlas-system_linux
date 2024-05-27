@@ -19,7 +19,7 @@ void list_dir(const char *path, int include_hidden) {
         return;
     }
   if (!(dir = opendir(path))) {
-        printf(strerror(errno));
+        printf(perror(errno));
     }
 
     while ((entry = readdir(dir)) != NULL) {
@@ -55,7 +55,6 @@ int main(int argc, char *argv[]) {
                 for (j = 1; argv[i][j] != '\0'; j++) {
                     switch (argv[i][j]) {
                         case '1':
-                            list_long = 1;
                             break;
                         default:
                             fprintf(stderr, "hls: invalid option -- '%c'\n", argv[i][j]);
