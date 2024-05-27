@@ -60,6 +60,7 @@ int main(int argc, char **argv) {
     size_t i, file_count = 0, d_count = 0;
      file_t **files = malloc(sizeof(**files) * BUFSIZE);
     file_t **directory = malloc(sizeof(**directory) * BUFSIZE);
+    char **args = malloc(argc * sizeof(char *));
     
     if (files == NULL || directory == NULL) {
         perror("Memory allocation error");
@@ -75,7 +76,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    char **args = malloc(argc * sizeof(char *));
     if (args == NULL) {
         perror("Memory allocation error");
         free(files);
