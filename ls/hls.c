@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
     int op_l = 0, op_A = 0;
     int i;
     int start = 1;
+    const char *dir;
 
     /*Parse command line arguments*/
     for (i = 1; i < argc; i++) {
