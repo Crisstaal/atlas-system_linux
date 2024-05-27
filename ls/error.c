@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "hls.h"
+#include <stdint.h>
 #include <stdlib.h>
 #include "options.h"
 
