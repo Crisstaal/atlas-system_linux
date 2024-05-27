@@ -1,5 +1,5 @@
-#ifndef HLS_H
-#define HLS_H
+#ifndef _HLS_H_
+#define _HLS_H_
 
 
 #include <dirent.h>
@@ -64,18 +64,5 @@ int _strcmp(char *, char *);
 int _strcoll(char *, char *);
 void *_memset(void *p, int b, size_t n);
 void *_calloc(unsigned int num, unsigned int size);
-
-#else
-
-#define dbg_printf(...)
-#define dbg_print_binary(x)
-#define dbg_print_file_array(x)
-#define dbg_swap(x, y, s, t)
-#define NONE		(0)
-#define ONEPERLINE	(1)
-#define ALL		(1 << 1)
-#define ALMOSTALL	(1 << 2)
-#define HUMAN		(1 << 3)
-#define LISTING		(1 << 4)
 
 #endif
