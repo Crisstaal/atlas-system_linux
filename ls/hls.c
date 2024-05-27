@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    list_dir(path, list_long);
+    list_dir(path, include_hidden,list_long);
 
     return EXIT_SUCCESS;
 }
