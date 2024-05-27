@@ -2,7 +2,6 @@
 #include "hls.h"
 #include <stdint.h>
 #include <stdlib.h>
-#include "options.h"
 
 void *_memset(void *c, int a, size_t b)
 {

@@ -9,12 +9,6 @@ typedef struct {
 } option_t;
 
 
-typedef enum {
-    NORMAL = 0,
-    CASE_INSENSITIVE = 1 << 0,
-    REVERSE = 1 << 1
-} option_t;
-
 /*Struct to hold option data*/
 typedef struct {
     char flag;
