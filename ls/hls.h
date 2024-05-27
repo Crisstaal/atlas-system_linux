@@ -25,7 +25,6 @@ typedef struct {
 
 
 
-// Function prototypes
 void print_error(const char *msg);
 void *_memset(void *c, int a, size_t b);
 void list_dir(const char *path, int include_hidden);

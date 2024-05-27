@@ -38,7 +38,7 @@ void list_dir(const char *path, int include_hidden) {
 
         if (S_ISLNK(sb.st_mode)) {
             char link_target[1024];
-            ssize_t len = readlink(fullpath, link_target, sizeof(link_target) - 1);
+            ssize_t len = readdir(fullpath, link_target, sizeof(link_target) - 1);
             if (len != -1) {
                 link_target[len] = '\0';
                 printf(" -> %s", link_target);
@@ -79,7 +79,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    list_dir(path, include_hidden);
 
     return EXIT_SUCCESS;
 }

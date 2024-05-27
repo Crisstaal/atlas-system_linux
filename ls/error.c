@@ -32,17 +32,17 @@ void print_error(const char *msg)
  */
 void *_calloc(unsigned int nmemb, unsigned int size)
 {
+    void *ptr = malloc(bytes);
+    size_t bytes = nmemb * size;
 	
     if (nmemb != 0 && size > __SIZE_MAX__ / nmemb) {
         return NULL;
     }
 
-    size_t bytes = nmemb * size;
     if (bytes == 0) {
         return NULL;
     }
 
-    void *ptr = malloc(bytes);
     if (!ptr) {
         return NULL;
     }
@@ -91,20 +91,21 @@ void parse_args(char **input_args, char **output_args, option_t *options)
  * @arg: containing flag string
  * @options: options
  */
-vvoid parse_opts(char *arg, OptionInfo *options) {
+void parse_opts(char *arg, OptionInfo *option) {
     OptionInfo OptionInfo[] = {
         {'a', 1, "Option A debug message"},
         {'b', 2, "Option B debug message"},
         {'c', 3, "Option C debug message"}
     };
 
+
     while (*arg) {
         int found = 0;
 
         for (size_t i = 0; i < sizeof(OptionInfo) / sizeof(OptionInfo[0]); ++i) {
-            if (arg[0] == '-' && arg[1] == OptionInfo[i].option1 && arg[2] == '\0') {
+            if (arg[0] == '-' && arg[1] == OptionInfo[i].option && arg[2] == '\0') {
                 printf("Option: %c, Option2: %d, Debug message: %s\n",
-                       OptionInfo[i].option1, OptionInfo[i].option2, OptionInfo[i].debug_message);
+                       OptionInfo[i].option, OptionInfo[i].option, OptionInfo[i].debug_message);
                 found = 1;
                 break;
             }
