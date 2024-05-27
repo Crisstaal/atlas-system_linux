@@ -143,7 +143,6 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
 
 		read_subentries(dir, dom, &sub_count);
 
-		sort_subentries(dom->subentries, sub_count);
 		print_subentries(dom, sub_count, (size_t)count, options);
 
 		if (i < (count - 1))
