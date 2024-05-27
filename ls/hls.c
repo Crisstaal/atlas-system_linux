@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     if (dir_count > 1)
         putchar('\n');
 
-    print_files_in_dirs(dir, dir_count, opt);
+    print_files_in_dir(dir, dir_count, opt);
 
     for (i = 0; i < file_count; ++i) {
         free(files[i]->name);
