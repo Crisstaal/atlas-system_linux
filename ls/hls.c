@@ -66,23 +66,19 @@ int main(int argc, char **argv) {
         perror("Memory allocation error");
         free(files);
         free(directory);
-        return 2;
+        free(args);
+        return EXIT_FAILURE;
+
     }
 
     if (argc < 2) {
         printf("Usage: %s <directory>\n", argv[0]);
         free(files);
         free(directory);
-        return 1;
-    }
+        free(args);
 
-    if (args == NULL) {
-        perror("Memory allocation error");
-        free(files);
-        free(directory);
-        return 2;
+        return EXIT_FAILURE;
     }
-
 
     /*Copy command-line arguments to args*/
     for (j = 0; j < argc; j++) {
@@ -90,18 +86,11 @@ int main(int argc, char **argv) {
     }
 
 
-    if (files == NULL || directory == NULL) {
-        perror("Memory allocation error");
-        free(args);
-        return 2;
-    }
-
     separate_files(args, files, directory, &file_count, &d_count);
 
 
     /* Printing */
     printf("options = %d = ", options);
-    dbg_print_binary(options);
     printf("file count = %lu\n", file_count);
 
     print_files_in_current_dir(files, file_count, options);

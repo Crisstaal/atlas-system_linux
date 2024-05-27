@@ -77,7 +77,7 @@ void read_subentries(DIR *dirp,
 	{
 		file_t *sub = malloc(sizeof(*sub));
 
-		sub->path = d->d_name;
+		sub->path = strdup(d->d_name);
 		lstat(sub->path, &sub->statbuf);
 		sub->is_dir = S_ISDIR(sub->statbuf.st_mode);
 		dom->subentries[(*sub_count)++] = sub;
