@@ -13,11 +13,11 @@ int main(int argc, char *argv[]) {
     size_t i, file_count = 0, dir_count = 0;
     char *def[] = {".", NULL};
     Opt_opt = NONE;
-    char **args = (char **)_calloc(BUFSIZE, sizeof(char *));
+    char **args = ((char **)calloc(BUFSIZE, sizeof(char *)));
     File **files = (File **)malloc(sizeof(File *) * BUFSIZE);
     File **dir = (File **)malloc(sizeof(File *) * BUFSIZE);
 
-    if (args == NULL || files == NULL || dirs == NULL) {
+    if (args == NULL || files == NULL || dir == NULL) {
         perror("Memory allocation error");
         exit(EXIT_FAILURE);
     }
