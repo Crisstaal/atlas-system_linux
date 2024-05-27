@@ -11,16 +11,16 @@ void list_directory(const char *dir, int op_l, int op_A) {
     struct dirent *d;
     DIR *dh = opendir(dir);
     int i, m, n;
+    size_t j, len, dir_len = 0;
     File *head = NULL, *tail = NULL, *new_file;
     File *f = head;
     int file_count = 0;
     char path[512];
     path[0] ='\0';
-    size_t j, len;
-    size_t dir_len = 0;
     File **file_array = NULL;
     free_file_list(head);
     
+
     if (!dh) {
         fprintf(stderr, "hls: cannot open directory '%s': ", dir);
         
