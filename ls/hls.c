@@ -55,7 +55,7 @@ void list_dir(const char *path, int include_hidden) {
 */
 
 int main(int argc, char **argv) {
-    char **args = calloc(BUFSIZE, sizeof(*args));
+    char **args = malloc(BUFSIZE, sizeof(*args));
     option_t options = NONE;
     int j;
     size_t i, file_count = 0, d_count = 0;
@@ -121,6 +121,7 @@ int main(int argc, char **argv) {
  * @size: integer
  * Return: null
  */
+ /**
 void *_calloc(unsigned int num, unsigned int size)
 {
 	void *t;
@@ -137,7 +138,7 @@ void *_calloc(unsigned int num, unsigned int size)
 	return (NULL);
 }
 
-
+*/
 /**
  * _memset - memory allocation
  * @p: pointer
