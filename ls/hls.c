@@ -45,6 +45,7 @@ void list_dir(const char *path, int include_hidden, int list_long) {
 
 int main(int argc, char *argv[]) {
     int list_long = 0;
+    int include_hidden = 0;
     char *path;
     int i, j;
 
