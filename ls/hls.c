@@ -57,44 +57,63 @@ void list_dir(const char *path, int include_hidden) {
 
 int main(int argc, char **argv)
 {
-	char *def[] = {".", NULL};
-	size_t i, file_count = 0, d_count = 0;
-	option_t options = NONE;
-	char **args = _calloc(BUFSIZE, sizeof(args));
-	file_t **files = malloc(sizeof(**files) * BUFSIZE);
-	file_t **directory = malloc(sizeof(**directory) * BUFSIZE);
+	int main(int argc, char **argv) {
+    if (argc < 2) {
+        printf("Usage: %s <directory>\n", argv[0]);
+        return 1;
+    }
 
-	/* options to be used*/
-	(void) argc;
-	if (!args[0]) {
-		perror("fail"), exit(2);
-	}
+    char **args = calloc(BUFSIZE, sizeof(*args));
+    if (args == NULL) {
+        perror("Memory allocation error");
+        return 2;
+    }
 
-	separate_files(args, files, directory, &file_count, &d_count);
+    /*Copy command-line arguments to args*/
+    for (int i = 0; i < argc; i++) {
+        args[i] = argv[i];
+    }
 
-	_alphasort(files, file_count);
+    size_t i, file_count = 0, d_count = 0;
+    option_t options = NONE;
+    file_t **files = malloc(sizeof(**files) * BUFSIZE);
+    file_t **directory = malloc(sizeof(**directory) * BUFSIZE);
 
-    /*printing*/
-	printf("options = %d = ", options);
-	dbg_print_binary(options);
-	printf("file count = %lu\n", file_count);
+    if (files == NULL || directory == NULL) {
+        perror("Memory allocation error");
+        free(args);
+        return 2;
+    }
 
-	print_files_in_current_dir(files, file_count, options);
+    separate_files(args, files, directory, &file_count, &d_count);
 
-	_alphasort(directory, d_count);
-	if (d_count > 1)
-		puts("");
-	print_files_in_directory(directory, d_count, options);
+    _alphasort(files, file_count);
 
-	for (i = 0; i < file_count; ++i)
-		free(files[i]);
-	for (i = 0; i < d_count; ++i)
-		free(directory[i]);
-	free(files);
-	free(directory);
-	free(args);
+    /* Printing */
+    printf("options = %d = ", options);
+    dbg_print_binary(options);
+    printf("file count = %lu\n", file_count);
 
-	return (0);
+    print_files_in_current_dir(files, file_count, options);
+
+    _alphasort(directory, d_count);
+    if (d_count > 1) {
+        puts("");
+    }
+    print_files_in_directory(directory, d_count, options);
+
+    for (i = 0; i < file_count; ++i) {
+        free(files[i]);
+    }
+    for (i = 0; i < d_count; ++i) {
+        free(directory[i]);
+    }
+    free(files);
+    free(directory);
+    free(args);
+
+    return (0);
+}
 }
 
 /**
