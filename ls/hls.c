@@ -55,7 +55,6 @@ void list_dir(const char *path, int include_hidden) {
 */
 
 int main(int argc, char **argv) {
-    char **args = malloc(BUFSIZE, sizeof(*args));
     option_t options = NONE;
     int j;
     size_t i, file_count = 0, d_count = 0;
