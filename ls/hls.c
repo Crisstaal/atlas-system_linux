@@ -3,6 +3,10 @@
 #include <string.h>
 #include "hls.h"
 
+void print_usage_and_exit(const char *program_name) {
+    fprintf(stderr, "Usage: %s [-l] [-A] [directory1 directory2 ...]\n", program_name);
+    exit(EXIT_FAILURE);
+}
 int main(int argc, char *argv[]) {
     int op_l = 0, op_A = 0;
     const char *dir = ".";
