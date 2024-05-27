@@ -21,12 +21,15 @@ void list_dir(const char *path, int include_hidden, int list_long) {
         return;
     }
 
+    printf("%s:\n", path);
+
     while ((entry = readdir(dir)) != NULL) {
         if (!include_hidden && entry->d_name[0] == '.')
         {
             continue;
         }
-        if (list_long) {
+        if (list_long)
+        {
             struct stat sb;
             char fullpath[1024];
             sprintf(fullpath, "%s/%s", path, entry->d_name);
@@ -38,7 +41,13 @@ void list_dir(const char *path, int include_hidden, int list_long) {
 
             printf("%s\n", entry->d_name);
         } else {
-            printf("%s ", entry->d_name);
+            printf("%s\n", entry->d_name);
+        }
+        
+        if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+            char subdir[1024];
+            sprintf(subdir, "%s/%s", path, entry->d_name);
+            list_dir(subdir, include_hidden, list_long);
         }
     }
 
