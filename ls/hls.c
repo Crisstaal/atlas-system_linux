@@ -54,7 +54,6 @@ int main(int argc, char *argv[]) {
                 for (j = 1; argv[i][j] != '\0'; j++) {
                     switch (argv[i][j]) {
                         case '1':
-                            list_long = 1;
                             break;
                         default:
                             printf("invalid option");
