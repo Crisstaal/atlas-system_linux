@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
     }
     if (dir) {
         closedir(dir);
-        list_dir(path, include_hidden, list_long);
+        list_dir(path, include_hidden);
     } else {
         fprintf(stderr, "./hls_01: cannot access %s: %s\n", path, strerror(errno));
         exit(EXIT_FAILURE);
