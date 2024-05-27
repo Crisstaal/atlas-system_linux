@@ -1,123 +1,82 @@
-#include <stdio.h>
 #include "hls.h"
-#include <stdint.h>
-#include <stdlib.h>
-
-void *_memset(void *c, int a, size_t b)
-{
-    size_t i;
-    char *ptr = c;
-    for (i = 0; i < b; i++)
-    {
-        *ptr++ = (char)a;
-    }
-
-    return c;
-}
-/**
-* print_error- print error
-* return: error
-*/
-void print_error(const char *msg)
-{
-    fprintf(stderr,"hls: %s\n", msg);
-     exit(EXIT_FAILURE);
-}
 
 /**
- * _calloc - allocates memory
- * @nmemb: integer
- * @size: number of integers for each element
- * Return: pointer or null
+ * dbg_print_array - prints pathn
+ * @array: the array
+ * @size: number of elements
  */
-void *_calloc(unsigned int nmemb, unsigned int size)
+void dbg_print_array(file_t **array, size_t size)
 {
-	void *ret;
-	size_t bytes;
+	size_t i = 0;
 
-	bytes = nmemb * size;
-	if (!bytes)
-		return (NULL);
-
-	ret = malloc(bytes);
-	if (ret)
-		return (_memset(ret, 0, bytes));
-
-	return (NULL);
-}
-
-int my_strcmp(const char *str1, const char *str2)
-{
-    while (*str1 && *str2 && (*str1 == *str2)) {
-        ++str1;
-        ++str2;
-    }
-    return *str1 - *str2;
-}
-
-/**
-* parse_args - parse args
-*@option_t - options
-*@input_args - put in args
-*/
-void parse_args(char **input_args, char **output_args, option_t *options)
-{
-    size_t input_index = 0, output_index = 0;
-
-    while (input_args[input_index] != NULL)
-    {
-        char *arg = input_args[input_index];
-        printf("parse_args:\n\targ = %s\n", arg);
-
-        if (arg[0] == '-' && my_strcmp(arg, "-") != 0)
-        {
-            parse_opts(arg, options);
-        }
-        else
-        {
-            output_args[output_index] = arg;
-            ++output_index;
-        }
-        ++input_index;
-    }
-    output_args[output_index] = NULL;
-}
-/**
- * parse_opts - parses opts
- * @arg: containing flag string
- * @options: options
- */
-oid parse_opts(char *arg, option_t *options)
-{
-	while (*++arg)
+	while (array && i < size)
 	{
-		switch (*arg)
-		{
-		case '1':
-			*options |= ONEPERLINE;
-			dbg_printf("parse_opts:\n\tcase %c\n", '1');
-			break;
-		case 'a':
-			*options |= ALL;
-			dbg_printf("parse_opts:\n\tcase %c\n", 'a');
-			break;
-		case 'A':
-			*options |= ALMOSTALL;
-			dbg_printf("parse_opts:\n\tcase %c\n", 'A');
-			break;
-		case 'h':
-			*options |= HUMAN;
-			dbg_printf("parse_opts:\n\tcase %c\n", 'h');
-			break;
-		case 'l':
-			*options |= LISTING;
-			dbg_printf("parse_opts:\n\tcase %c\n", 'l');
-			break;
-		default:
-			dbg_printf("TODO: handle bad flag\n");
-			fprintf(stderr, "Unknown flag\n");
-			exit(2);
-			break;
-		}
+		if (i > 0)
+			printf(", ");
+		printf("%s", array[i]->path);
+		++i;
+	}
+	printf("\n");
+}
+
+/**
+ * dbg_swap - swaps two values
+ * @a: first value to swap
+ * @b: second value to swap
+ * @array: pointer to first element of initial array
+ * @size: full size of initial array
+ */
+void dbg_swap(file_t **a, file_t **b, file_t **array, size_t size)
+{
+	/* for printing */
+	static file_t **ptr;
+	static size_t s;
+
+	file_t *tmp = *a;
+
+	if (*a != *b)
+	{
+		*a = *b;
+		*b = tmp;
+		if (!ptr)
+			ptr = array, s = size;
+		dbg_print_array(ptr, s);
 	}
 }
+
+
+/**
+  * dbg_print_binary - prints the binary representation
+  * @r: unsigned char
+  */
+void dbg_print_binary(unsigned char r)
+{
+	int bits = 8;
+	int bit_offset = sizeof(r) * bits;
+	unsigned char bit = 1 << (bit_offset - 1);
+
+	while (bits)
+	{
+		if (bits)
+			(bit & r) ? putchar('1') : putchar('0');
+		bit >>= 1;
+		--bits;
+	}
+	putchar('\n');
+}
+/**
+ * sort_subentries - sorts an array l
+ * @directory: directory
+ * @d_count: count
+ */
+void sort_subentries(file_t **directory, int d_count)
+{
+	_alphasort(dirs, (size_t)d_count);
+}
+
+void _alphasort(file_t **files, int file_count)
+{
+	_quicksort(files, (size_t)file_count);
+}
+
+/**

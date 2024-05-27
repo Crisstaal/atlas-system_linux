@@ -4,14 +4,29 @@
 
 #include <dirent.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
+
+#else
+
+#define dbg_printf(...)
+#define dbg_print_binary(x)
+#define dbg_print_file_array(x)
+#define dbg_swap(x, y, s, t)
+#define NONE		(0)
+#define ONEPERLINE	(1)
+#define ALL		(1 << 1)
+#define ALMOSTALL	(1 << 2)
+#define HUMAN		(1 << 3)
+#define LISTING		(1 << 4)
+
 
 #define BUFSIZE 1024
-
-typedef struct {
-    int option1;
-    char option2;
-} option_t;
-
+#define dbg_printf printf
+#define SLICE(str, a, b) (str[b] = '\0', &str[a])
+typedef unsigned char option_t;
 
 typedef struct file_t
 {
@@ -21,27 +36,46 @@ typedef struct file_t
 	struct file_t **subentries;
 } file_t;
 
-/*Struct to hold option data*/
-typedef struct {
-    char flag;
-    option_t option;
-} OptionInfo;
+struct file_node_t
+{
+	char filename[256];
 
+	size_t prev;
+	size_t next;
+};
 
+void separate_files(char **, file_t **, file_t **, size_t *, size_t *);
+void print_files_in_current_dir(file_t **, size_t, option_t);
+void read_subentries(DIR *, file_t *, size_t *);
+void print_subentries(file_t *, size_t, size_t, option_t);
+void print_files_in_directory(file_t **, size_t, option_t);
+/* error.c */
+void dbg_print_binary(unsigned char);
+void dbg_print_file_array(file_t **, size_t);
+void dbg_swap(file_t **, file_t **, file_t **, size_t);
+void _quicksort(file_t **, size_t);
+void _alphasort(file_t **, int);
+void sort_subentries(file_t **, int);
+/*hls.c*/
+int create_fullpath(char **, const char *, char *);
+int hls(const char *[]);
+size_t _strlen(const char *);
+int _strcmp(char *, char *);
+int _strcoll(char *, char *);
+void *_memset(void *p, int b, size_t n);
+void *_calloc(unsigned int num, unsigned int size);
 
-void print_error(const char *msg);
-void *_memset(void *c, int a, size_t b);
-void list_dir(const char *path, int include_hidden);
-int is_hidden(const char *name);
-void *_calloc(unsigned int nmemb, unsigned int size)
-void print_file_info(const char *filename);
-int my_strcmp(const char *str1, const char *str2);
-void parse_opts(char *arg, option_t *options);
-void parse_args(char **input_args, char **output_args, option_t *options);
-void print_array(file_t **array, size_t size, FILE *stream);
-void prints_binary(unsigned char r);
-void print_swap(file_t **a, file_t **b, file_t **array, size_t size, FILE *stream);
-int _strcoll(const char *s1, const char *s2, option_t option);
-size_t _strlen(const char *src);
+#else
+
+#define dbg_printf(...)
+#define dbg_print_binary(x)
+#define dbg_print_file_array(x)
+#define dbg_swap(x, y, s, t)
+#define NONE		(0)
+#define ONEPERLINE	(1)
+#define ALL		(1 << 1)
+#define ALMOSTALL	(1 << 2)
+#define HUMAN		(1 << 3)
+#define LISTING		(1 << 4)
 
 #endif

@@ -53,33 +53,85 @@ void list_dir(const char *path, int include_hidden) {
     closedir(dir);
 }
 */
-int main(int argc, char *argv[]) {
-    char *path;
-    int i, j;
-    int include_hidden;
+int main(int argc, char **argv)
+{
+	char *def[] = {".", NULL};
+	size_t i, file_count = 0, dir_count = 0;
+	option_t options = NONE;
+	char **args = _calloc(BUFSIZE, sizeof(args));
+	file_t **files = malloc(sizeof(**files) * BUFSIZE);
+	file_t **dirs = malloc(sizeof(**dirs) * BUFSIZE);
 
-    if (argc == 1) {
-        path = ".";
-    } else {
-        i = 1;
-        while (i < argc) {
-            if (argv[i][0] == '-') {
-                for (j = 1; argv[i][j] != '\0'; j++) {
-                    switch (argv[i][j]) {
-                        case '1':
-                            break;
-                        default:
-                            fprintf(stderr, "hls: invalid option -- '%c'\n", argv[i][j]);
-                            exit(EXIT_FAILURE);
-                    }
-                }
-            } else {
-                path = argv[i];
-            }
-            i++;
-        }
-    }
+	/* options to be used*/
+	(void) argc;
+	parse_args(argv + 1, args, &options);
+	if (!args[0])
+		parse_args(def, args, &options);
+	if (!args[0])
+		perror("fail"), exit(2);
+
+	separate_files(args, files, dirs, &file_count, &dir_count);
+
+	_alphasort(files, file_count);
+
+    /*printing*/
+	dbg_printf("options = %d = ", options);
+	dbg_print_binary(options);
+	dbg_printf("file count = %lu\n", file_count);
+	print_files_in_current_dir(files, file_count, options);
+
+	_alphasort(dirs, dir_count);
+	if (dir_count > 1)
+		puts("");
+	print_files_in_dirs(dirs, dir_count, options);
+
+	for (i = 0; i < file_count; ++i)
+		free(files[i]);
+	for (i = 0; i < dir_count; ++i)
+		free(dirs[i]);
+	free(files);
+	free(dirs);
+	free(args);
+
+	return (0);
+}
+
+/**
+ * _calloc - allocates memory
+ * @num: integer
+ * @size: integer
+ * Return: null
+ */
+void *_calloc(unsigned int num, unsigned int size)
+{
+	void *t;
+	size_t bytes;
+
+	bytes = num * size;
+	if (!bytes)
+		return (NULL);
+
+	t = malloc(bytes);
+	if (t)
+		return (_memset(t, 0, bytes));
+
+	return (NULL);
+}
 
 
-    return EXIT_SUCCESS;
+/**
+ * _memset - memory allocation
+ * @p: pointer
+ * @b: integer
+ * @n: count
+ * Return: pointer to the memory area s.
+ */
+void *_memset(void *p, int b, size_t n)
+{
+	char *ptr = p;
+
+	while (n--)
+		*ptr++ = b;
+
+	return (p);
 }
