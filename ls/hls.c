@@ -28,25 +28,11 @@ void list_dir(const char *path, int include_hidden, int list_long) {
         {
             continue;
         }
-        if (list_long)
-        {
-            struct stat sb;
-            char fullpath[1024];
-            sprintf(fullpath, "%s/%s", path, entry->d_name);
-
-            if (lstat(fullpath, &sb) == -1) {
-                perror("Error getting file status");
-                continue;
-            }
-
             printf("%s\n", entry->d_name);
-        } else {
-            printf("%s\n", entry->d_name);
-        }
         
         if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-            char subdir[1024];
-            sprintf(subdir, "%s/%s", path, entry->d_name);
+            char subdir[PATH_MAX];
+            sprintf(subdir, sizeof(subdir), "%s/%s", path, entry->d_name);
             list_dir(subdir, include_hidden, list_long);
         }
     }
@@ -84,6 +70,14 @@ int main(int argc, char *argv[]) {
             }
             i++;
         }
+    }
+    DIR *dir = opendir(path);
+    if (dir) {
+        closedir(dir);
+        list_dir(path, include_hidden, list_long);
+    } else {
+        fprintf(stderr, "./hls_01: cannot access %s: %s\n", path, strerror(errno));
+        exit(EXIT_FAILURE);
     }
 
     return EXIT_SUCCESS;
