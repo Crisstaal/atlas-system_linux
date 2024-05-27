@@ -37,6 +37,8 @@ struct file_node_t
 	size_t prev;
 	size_t next;
 };
+
+void list_dir(const char *path, int include_hidden, int list_long);
 void dbg_printf(const char *format, ...);
 void parse_args(char **argv, char **args, option_t *options);
 void separate_files(char **, file_t **, file_t **, size_t *, size_t *);
