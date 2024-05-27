@@ -10,6 +10,10 @@ typedef struct {
     char option2;
 } option_t;
 
+typedef struct {
+    char filename[256];
+    int file_size;
+} file_t;
 
 /*Struct to hold option data*/
 typedef struct {
@@ -27,6 +31,7 @@ void list_dir(const char *path, int include_hidden);
 int is_hidden(const char *name);
 void print_file_info(const char *filename);
 int my_strcmp(const char *str1, const char *str2);
+void parse_opts(char *arg, option_t *options);
 void parse_args(char **input_args, char **output_args, option_t *options);
 void print_array(file_t **array, size_t size, FILE *stream);
 void prints_binary(unsigned char r);

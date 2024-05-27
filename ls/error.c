@@ -102,7 +102,7 @@ void parse_opts(char *arg, option_t *options)
             if (*arg == optionInfo[i].flag)
             {
                 *options |= optionInfo[i].option;
-                d_printf(optionInfo[i].debug_message, *arg);
+                dprintf(optionInfo[i].debug_message, *arg);
                 found = 1;
                 break;
             }
@@ -110,7 +110,7 @@ void parse_opts(char *arg, option_t *options)
         
         if (!found)
         {
-            dbg_printf("TODO: handle bad flag\n");
+            dprintf("TODO: handle bad flag\n");
             fprintf(stderr, "Unknown flag\n");
             exit(2);
         }
