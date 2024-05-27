@@ -29,12 +29,6 @@ void list_dir(const char *path, int include_hidden, int list_long) {
             continue;
         }
             printf("%s\n", entry->d_name);
-        
-        if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-            char subdir[PATH_MAX];
-            printf(subdir, (subdir), "%s/%s", path, entry->d_name);
-            list_dir(subdir, include_hidden, list_long);
-        }
     }
 
     closedir(dir);
