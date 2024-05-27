@@ -33,7 +33,7 @@ void print_error(const char *msg)
 void *_calloc(unsigned int nmemb, unsigned int size)
 {
 	
-    if (nmemb != 0 && size > _SIZE_MAX_ / nmemb) {
+    if (nmemb != 0 && size > __SIZE_MAX__ / nmemb) {
         return NULL;
     }
 

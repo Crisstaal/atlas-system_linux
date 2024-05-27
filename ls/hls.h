@@ -3,6 +3,12 @@
 
 #include <dirent.h>
 
+typedef struct {
+    int option1;
+    char option2;
+} option_t;
+
+
 typedef enum {
     NORMAL = 0,
     CASE_INSENSITIVE = 1 << 0,
@@ -16,14 +22,6 @@ typedef struct {
     const char *debug_message;
 } OptionInfo;
 
-/*Array of option mappings*/
-OptionInfo optionInfo[] = {
-    {'1', ONEPERLINE, "parse_opts:\n\tcase %c\n"},
-    {'a', ALL, "parse_opts:\n\tcase %c\n"},
-    {'A', ALMOSTALL, "parse_opts:\n\tcase %c\n"},
-    {'h', HUMAN, "parse_opts:\n\tcase %c\n"},
-    {'l', LISTING, "parse_opts:\n\tcase %c\n"}
-};
 
 
 // Function prototypes
