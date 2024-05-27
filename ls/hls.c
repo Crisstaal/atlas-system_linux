@@ -65,6 +65,7 @@ int main(int argc, char *argv[]) {
     int include_hidden = 0;
     char *path = ".";
     int i, j;
+    struct stat path_stat;
 
     if (argc >1) {
         i = 1;
@@ -87,7 +88,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    struct stat path_stat;
     if (stat(path, &path_stat) != -1) {
         if (S_ISREG(path_stat.st_mode)) {
             printf("[Got]\n");
