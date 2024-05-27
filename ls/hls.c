@@ -61,15 +61,32 @@ int main(int argc, char **argv) {
      file_t **files = malloc(sizeof(**files) * BUFSIZE);
     file_t **directory = malloc(sizeof(**directory) * BUFSIZE);
     
+    if (files == NULL || directory == NULL) {
+        perror("Memory allocation error");
+        free(files);
+        free(directory);
+        return 2;
+    }
+
     if (argc < 2) {
         printf("Usage: %s <directory>\n", argv[0]);
+        free(files);
+        free(directory);
         return 1;
+    }
+
+    char **args = malloc(argc * sizeof(char *));
+    if (args == NULL) {
+        perror("Memory allocation error");
+        free(files);
+        free(directory);
+        return 2;
     }
 
 
     /*Copy command-line arguments to args*/
     for (j = 0; j < argc; j++) {
-        argc[j] = argv[j];
+        args[j] = argv[j];
     }
 
 
