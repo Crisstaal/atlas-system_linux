@@ -16,25 +16,7 @@ void swap(file_t **a, file_t **b)
 	*b = tmp;
 }
 
-/**
- * _quicksort - sorts an array
- * @array: array
- * @size: length
- */
-void _quicksort(file_t **array, size_t size)
-{
-	int pivot;
-	if (size > 1)
-	{
-		pivot = partition(array, 0, size - 1);
-
-		_quicksort(array, pivot);
-		_quicksort(array + pivot + 1, size - pivot - 1);
-	}
-}
-
-/**
- * _strcoll - handles the special options
+/** _strcoll - handles the special options
  * @s1: pointer
  * @s2: pointer
  *

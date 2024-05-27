@@ -37,7 +37,8 @@ struct file_node_t
 	size_t prev;
 	size_t next;
 };
-
+void dbg_printf(const char *format, ...);
+void parse_args(char **argv, char **args, option_t *options);
 void separate_files(char **, file_t **, file_t **, size_t *, size_t *);
 void print_files_in_current_dir(file_t **, size_t, option_t);
 void read_subentries(DIR *, file_t *, size_t *);
@@ -53,8 +54,6 @@ void _alphasort(file_t **, int);
 void sort_subentries(file_t **, int);
 
 /*hls.c*/
-void parse_args(char **argv, char **args, option_t *options);
-void dbg_printf(const char *format, ...);
 int create_fullpath(char **, const char *, char *);
 int hls(const char *[]);
 size_t _strlen(const char *);

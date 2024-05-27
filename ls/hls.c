@@ -53,6 +53,8 @@ void list_dir(const char *path, int include_hidden) {
     closedir(dir);
 }
 */
+
+/**
 int main(int argc, char **argv)
 {
 	char *def[] = {".", NULL};
@@ -63,6 +65,7 @@ int main(int argc, char **argv)
 	file_t **directory = malloc(sizeof(**directory) * BUFSIZE);
 
 	/* options to be used*/
+	/*
 	(void) argc;
 	parse_args(argv + 1, args, &options);
 	if (!args[0])
@@ -75,9 +78,11 @@ int main(int argc, char **argv)
 	_alphasort(files, file_count);
 
     /*printing*/
+	/**
 	dbg_printf("options = %d = ", options);
 	dbg_print_binary(options);
 	dbg_printf("file count = %lu\n", file_count);
+
 	print_files_in_current_dir(files, file_count, options);
 
 	_alphasort(directory, d_count);
@@ -94,7 +99,46 @@ int main(int argc, char **argv)
 	free(args);
 
 	return (0);
+**/
+
+int main(int argc, char *argv[]) {
+    int list_long = 0;
+    int include_hidden = 0;
+    char *path = ".";
+    int i, j;
+    DIR *dir = opendir(path);
+    
+    if (argc >1) {
+        i = 1;
+        while (i < argc) {
+            if (argv[i][0] == '-') {
+                for (j = 1; argv[i][j] != '\0'; j++) {
+                    switch (argv[i][j]) {
+                        case '1':
+                            list_long = 1;
+                            break;
+                        default:
+                            printf("invalid option");
+                            exit(EXIT_FAILURE);
+                    }
+                }
+            } else {
+                path = argv[i];
+            }
+            i++;
+        }
+    }
+    if (dir) {
+        closedir(dir);
+        list_dir(path, include_hidden, list_long);
+    } else {
+        fprintf(stderr, "./hls_01: cannot access %s: %s\n", path, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    return EXIT_SUCCESS;
 }
+
 
 /**
  * _calloc - allocates memory
