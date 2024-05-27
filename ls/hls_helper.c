@@ -23,9 +23,10 @@ void swap(file_t **a, file_t **b)
  */
 void _quicksort(file_t **array, size_t size)
 {
+	int pivot;
 	if (size > 1)
 	{
-		int pivot = partition(array, 0, size - 1);
+		pivot = partition(array, 0, size - 1);
 
 		_quicksort(array, pivot);
 		_quicksort(array + pivot + 1, size - pivot - 1);

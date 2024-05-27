@@ -88,13 +88,13 @@ void read_subentries(DIR *dirp,
  * @directory_count: count
  * @options: options available
  */
-void print_subentries(file_t *dom,size_t sub_count,size_t directory_count, option_t options)
+void print_subentries(file_t *dom,size_t sub_count,size_t d_count, option_t options)
 {
 	char *buf = malloc(sizeof(*buf) * BUFSIZE);
 	char *start = buf;
 	size_t i = 0;
 
-	if (dir_count > 1)
+	if (d_count > 1)
 		printf("%s:\n", dom->path);
 	for (; i < sub_count; ++i)
 	{

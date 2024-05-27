@@ -27,6 +27,7 @@ typedef struct file_t
 	char *path;
 	struct stat statbuf;
 	int is_dir;
+	subentry_t **subentries;
 }file_t;
 
 struct file_node_t
