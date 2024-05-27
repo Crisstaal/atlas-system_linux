@@ -97,12 +97,12 @@ void parse_opts(char *arg, option_t *options)
     {
         int found = 0;
         
-        for (size_t i = 0; i < sizeof(OptionInfo) / sizeof(optionInfo[0]); ++i)
+        for (size_t i = 0; i < sizeof(OptionInfo) / sizeof(OptionInfo[0]); ++i)
         {
             if (*arg == optionInfo[i].flag)
             {
                 *options |= optionInfo[i].option;
-                dprintf(optionInfo[i].debug_message, *arg);
+                dprintf(2, "%s\n" OptionInfo[i].debug_message);
                 found = 1;
                 break;
             }
@@ -110,7 +110,6 @@ void parse_opts(char *arg, option_t *options)
         
         if (!found)
         {
-            dprintf("TODO: handle bad flag\n");
             fprintf(stderr, "Unknown flag\n");
             exit(2);
         }
