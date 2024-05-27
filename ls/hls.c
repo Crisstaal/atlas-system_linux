@@ -54,52 +54,7 @@ void list_dir(const char *path, int include_hidden) {
 }
 */
 
-/**
-int main(int argc, char **argv)
-{
-	char *def[] = {".", NULL};
-	size_t i, file_count = 0, d_count = 0;
-	option_t options = NONE;
-	char **args = _calloc(BUFSIZE, sizeof(args));
-	file_t **files = malloc(sizeof(**files) * BUFSIZE);
-	file_t **directory = malloc(sizeof(**directory) * BUFSIZE);
 
-	/* options to be used*/
-	/*
-	(void) argc;
-	parse_args(argv + 1, args, &options);
-	if (!args[0])
-		parse_args(def, args, &options);
-	if (!args[0])
-		perror("fail"), exit(2);
-
-	separate_files(args, files, directory, &file_count, &d_count);
-
-	_alphasort(files, file_count);
-
-    /*printing*/
-	/**
-	dbg_printf("options = %d = ", options);
-	dbg_print_binary(options);
-	dbg_printf("file count = %lu\n", file_count);
-
-	print_files_in_current_dir(files, file_count, options);
-
-	_alphasort(directory, d_count);
-	if (d_count > 1)
-		puts("");
-	print_files_in_directory(directory, d_count, options);
-
-	for (i = 0; i < file_count; ++i)
-		free(files[i]);
-	for (i = 0; i < d_count; ++i)
-		free(directory[i]);
-	free(files);
-	free(directory);
-	free(args);
-
-	return (0);
-**/
 
 int main(int argc, char *argv[]) {
     int list_long = 0;
