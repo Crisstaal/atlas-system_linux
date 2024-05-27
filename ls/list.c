@@ -12,6 +12,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
     DIR *dh = opendir(dir);
     int i, m, n;
     File *head = NULL, *tail = NULL, *new_file;
+    File *f = head;
     int file_count = 0;
     char path[512];
     path[0] ='\0';
