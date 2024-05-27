@@ -52,9 +52,6 @@ void list_dir(const char *path, int include_hidden, int list_long) {
     }
 
     closedir(dir);
-    if (!list_long) {
-        printf("\n");
-    }
 }
 
 
