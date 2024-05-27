@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
     /*printing*/
 	printf("options = %d = ", options);
-	print_binary(options);
+	dbg_print_binary(options);
 	printf("file count = %lu\n", file_count);
 
 	print_files_in_current_dir(files, file_count, options);
