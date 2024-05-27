@@ -10,8 +10,6 @@
 #include <time.h>
 
 
-#define dbg_print_binary(x)
-#define dbg_swap(x, y, s, t)
 #define NONE		(0)
 #define ONEPERLINE	(1)
 #define ALL		(1 << 1)
@@ -23,7 +21,6 @@
 #define BUFSIZE 1024
 #define SLICE(str, a, b) (str[b] = '\0', &str[a])
 typedef unsigned char option_t;
-typedef struct file_t file_t;
 
 typedef struct file_t
 {
@@ -45,6 +42,7 @@ void print_files_in_current_dir(file_t **, size_t, option_t);
 void read_subentries(DIR *, file_t *, size_t *);
 void print_subentries(file_t *, size_t, size_t, option_t);
 void print_files_in_directory(file_t **, size_t, option_t);
+
 /* error.c */
 void dbg_print_binary(unsigned char r);
 void dbg_print_array(file_t **array, size_t size);
@@ -52,6 +50,7 @@ void dbg_swap(file_t **a, file_t **b, file_t **array, size_t size);
 void _quicksort(file_t **array, size_t size);
 void _alphasort(file_t **, int);
 void sort_subentries(file_t **, int);
+
 /*hls.c*/
 int create_fullpath(char **, const char *, char *);
 int hls(const char *[]);

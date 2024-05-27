@@ -21,9 +21,9 @@ void dbg_print_array(file_t **array, size_t size)
 
 /**
  * dbg_swap - swaps two values
- * @a: first value to swap
- * @b: second value to swap
- * @array: pointer to first element of initial array
+ * @a: first value
+ * @b: second value
+ * @array: pointer
  * @size: full size of initial array
  */
 void dbg_swap(file_t **a, file_t **b, file_t **array, size_t size)
