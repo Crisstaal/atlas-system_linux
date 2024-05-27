@@ -10,7 +10,7 @@ void list_dir(const char *path, int include_hidden, int list_long) {
     struct dirent *entry;
 
     if (!(dir = opendir(path))) {
-        print_error("Cannot open directory");
+        strerror("Cannot open directory");
         return;
     }
 
