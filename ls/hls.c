@@ -92,7 +92,7 @@ void list_dir(const char *path, int include_hidden) {
 
     print_files_in_current_dir(files, file_count, options);
 
-    _alphasort(directory, d_count);
+    
     if (d_count > 1) {
         puts("");
     }
