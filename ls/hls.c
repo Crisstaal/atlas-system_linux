@@ -6,7 +6,8 @@
 #include <string.h>
 
 /**
-* list_dir: directory listing
+* list_dir-  directory listing
+* @path - path
 * return: list
 */
 
@@ -16,7 +17,7 @@ void list_dir(const char *path, int include_hidden, int list_long) {
     
     if (!(dir = opendir(path)))
     {
-        printf("Cannot open directory");
+         fprintf(stderr, "./hls_01: cannot access %s: No such file or directory\n", path);
         return;
     }
 
@@ -31,7 +32,7 @@ void list_dir(const char *path, int include_hidden, int list_long) {
             sprintf(fullpath, "%s/%s", path, entry->d_name);
 
             if (lstat(fullpath, &sb) == -1) {
-                printf("Error getting file status");
+                perror("Error getting file status");
                 continue;
             }
 
@@ -50,18 +51,16 @@ void list_dir(const char *path, int include_hidden, int list_long) {
 
 /**
 * main - main function
-* argc - argument count
-* argv - number or arguments
+* @argc - argument count
+* @argv - number or arguments
 */
 int main(int argc, char *argv[]) {
     int list_long = 0;
     int include_hidden = 0;
-    char *path;
+    char *path = ".";
     int i, j;
 
-    if (argc == 1) {
-        path = ".";
-    } else {
+    if (argc >1) {
         i = 1;
         while (i < argc) {
             if (argv[i][0] == '-') {
