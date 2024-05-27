@@ -11,19 +11,20 @@
 */
 void list_dir(const char *path, int include_hidden) {
     DIR *dir;
+    int include_hidden;
     struct dirent *entry;
     
     if (!(dir = opendir(path)))
     {
-        fprintf(stderr, "./hls: cannot access %s: %s\n", path, strerror(errno));
+        fprintf(stderr, "./hls: cannot access %s: %s\n", path, perror(errno));
         return;
     }
   if (!(dir = opendir(path))) {
-        print_error(strerror(errno));
+        printf(strerror(errno));
     }
 
     while ((entry = readdir(dir)) != NULL) {
-        if (list_long) {
+        if (list_dir) {
             struct stat sb;
             char fullpath[1024]; // Adjust size as needed
             snprintf(fullpath, sizeof(fullpath), "%s/%s", path, entry->d_name);
@@ -72,7 +73,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    list_dir(path, list_long);
+    list_dir(path, include_hidden);
 
     return EXIT_SUCCESS;
 }
