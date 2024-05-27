@@ -14,10 +14,10 @@ void list_directory(const char *dir, int op_l, int op_A) {
     size_t j, len, dir_len = 0;
     File *head = NULL, *tail = NULL, *new_file;
     File *f = head;
+    File **file_array = NULL;
     int file_count = 0;
     char path[512];
     path[0] ='\0';
-    File **file_array = NULL;
     free_file_list(head);
     
 
