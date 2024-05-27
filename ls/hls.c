@@ -65,8 +65,6 @@ int main(int argc, char *argv[]) {
     int include_hidden = 0;
     char *path = ".";
     int i, j;
-    struct stat path_stat;
-
     if (argc >1) {
         i = 1;
         while (i < argc) {
@@ -88,16 +86,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (stat(path, &path_stat) != -1) {
-        if (S_ISREG(path_stat.st_mode)) {
-            printf("[Got]\n");
-            printf("%s\n", path);
-        } else if (S_ISDIR(path_stat.st_mode)) {
-            list_dir(path, include_hidden, list_long);
-        }
-    } else {
-        exit(EXIT_FAILURE);
-    }
-
     return EXIT_SUCCESS;
 }
+
