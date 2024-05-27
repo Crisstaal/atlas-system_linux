@@ -52,6 +52,8 @@ void _alphasort(file_t **, int);
 void sort_subentries(file_t **, int);
 
 /*hls.c*/
+void parse_args(char **argv, char **args, option_t *options);
+void dbg_printf(const char *format, ...);
 int create_fullpath(char **, const char *, char *);
 int hls(const char *[]);
 size_t _strlen(const char *);
