@@ -11,7 +11,6 @@
 */
 void list_dir(const char *path, int include_hidden) {
     DIR *dir;
-    int include_hidden;
     struct dirent *entry;
     
     if (!(dir = opendir(path)))
@@ -40,15 +39,12 @@ void list_dir(const char *path, int include_hidden) {
     }
 
     closedir(dir);
-    if (!list_long) {
-        printf("\n");
-    }
 }
 
 int main(int argc, char *argv[]) {
-    int list_long = 0;
     char *path;
     int i, j;
+    int include_hidden;
 
     if (argc == 1) {
         path = ".";
