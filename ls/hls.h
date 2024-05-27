@@ -64,8 +64,7 @@ int _strcoll(char *, char *);
 void *_memset(void *p, int b, size_t n);
 void *_calloc(unsigned int num, unsigned int size);
 int partition(file_t **array, int low, int high);
-void sort_subentries(file_t **directory, int d_count);
-qsort(directory, d_count, sizeof(*directory), compare_function);
+void sort_subentries(file_t **directory, int d_count)
 
 
 #endif
