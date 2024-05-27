@@ -1,61 +1,78 @@
 #include <stdio.h>
-#include "hls.h"
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include <errno.h>
-#include <string.h>
-#include <unistd.h>
+#include "hls.h"
 
-#define BUFSIZE 1024
+/**
+* list_dir-  directory listing
+* @path - path
+* return: list
+*/
+void list_dir(const char *path, int include_hidden) {
+    DIR *dir;
+    struct dirent *entry;
+    
+    if (!(dir = opendir(path)))
+    {
+        fprintf(stderr, "./hls: cannot access %s: %s\n", path, strerror(errno));
+        return;
+    }
+  if (!(dir = opendir(path))) {
+        print_error(strerror(errno));
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (list_long) {
+            struct stat sb;
+            char fullpath[1024]; // Adjust size as needed
+            snprintf(fullpath, sizeof(fullpath), "%s/%s", path, entry->d_name);
+
+            if (lstat(fullpath, &sb) == -1) {
+                print_error(strerror(errno));
+            }
+
+            printf("%s\n", entry->d_name);
+        } else {
+            printf("%s ", entry->d_name);
+        }
+    }
+
+    closedir(dir);
+    if (!list_long) {
+        printf("\n");
+    }
+}
 
 int main(int argc, char *argv[]) {
-    size_t i, file_count = 0, dir_count = 0;
-    char *def[] = {".", NULL};
-    Opt_opt = NONE;
-    char **args = ((char **)calloc(BUFSIZE, sizeof(char *)));
-    File **files = (File **)malloc(sizeof(File *) * BUFSIZE);
-    File **dir = (File **)malloc(sizeof(File *) * BUFSIZE);
+    int list_long = 0;
+    char *path;
+    int i, j;
 
-    if (args == NULL || files == NULL || dir == NULL) {
-        perror("Memory allocation error");
-        exit(EXIT_FAILURE);
+    if (argc == 1) {
+        path = ".";
+    } else {
+        i = 1;
+        while (i < argc) {
+            if (argv[i][0] == '-') {
+                for (j = 1; argv[i][j] != '\0'; j++) {
+                    switch (argv[i][j]) {
+                        case '1':
+                            list_long = 1;
+                            break;
+                        default:
+                            fprintf(stderr, "hls: invalid option -- '%c'\n", argv[i][j]);
+                            exit(EXIT_FAILURE);
+                    }
+                }
+            } else {
+                path = argv[i];
+            }
+            i++;
+        }
     }
 
-    parse_args(argv + 1, args, &opt);
-    if (!args[0])
-        parse_args(def, args, &opt);
-    if (!args[0]) {
-        fprintf(stderr, "Usage: %s [directory]\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
+    list_dir(path, list_long);
 
-    separate_files(args, files, dir, &file_count, &dir_count);
-
-    _alphasort(files, file_count);
-
-    printf("Opt = %d\n", opt);
-    printf("File count = %lu\n", file_count);
-
-    print_files_in_current_dir(files, file_count, opt);
-
-    if (dir_count > 1)
-        putchar('\n');
-
-    print_files_in_dir(dir, dir_count, opt);
-
-    for (i = 0; i < file_count; ++i) {
-        free(files[i]->name);
-        free(files[i]);
-    }
-    for (i = 0; i < dir_count; ++i) {
-        free(dir[i]->name);
-        free(dir[i]);
-    }
-
-    free(files);
-    free(dir);
-    free(args);
-
-    return 0;
+    return EXIT_SUCCESS;
 }
