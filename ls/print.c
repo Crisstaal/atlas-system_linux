@@ -1,4 +1,7 @@
 #include "hls.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
 
 /**
  * separate_files - it does this
@@ -122,28 +125,33 @@ void print_subentries(file_t *dom,size_t sub_count,size_t d_count, option_t opti
  */
 void print_files_in_directory(file_t **directory,size_t count,option_t options)
 {
-	size_t i;
-    size_t j = 0;
+	size_t i, j;
 
-	for (i = 0;, i< d_count; ++i)
+	for (i = 0; i< d_count; ++i)
 	{
 		file_t *dom = directory[i];
 		size_t sub_count = 0;
 		DIR *dir = opendir(dom->path);
 
+		if (dir == NULL)
+        {
+            perror("opendir");
+            continue;
+        }
+
 		dom->subentries = malloc(sizeof(dom->subentries) * BUFSIZE);
 
-		read_subentries(directory, dom, &sub_count);
+		read_subentries(dir, dom, &sub_count);
 
 		sort_subentries(dom->subentries, sub_count);
-		print_subentries(dom, sub_count, (size_t)d_count, options);
+		print_subentries(dom, sub_count, (size_t)count, options);
 
 		if (i < (d_count - 1))
 			puts("");
 
 		{
 
-			for (j < sub_count; ++j)
+			for (j = 0; < sub_count; ++j)
 				free(dom->subentries[j]);
 			free(dom->subentries);
 		}
