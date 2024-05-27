@@ -51,6 +51,8 @@ int main(int argc, char *argv[]) {
     int include_hidden = 0;
     char *path = ".";
     int i, j;
+    DIR *dir = opendir(path);
+    
     if (argc >1) {
         i = 1;
         while (i < argc) {
@@ -71,7 +73,6 @@ int main(int argc, char *argv[]) {
             i++;
         }
     }
-    DIR *dir = opendir(path);
     if (dir) {
         closedir(dir);
         list_dir(path, include_hidden, list_long);
