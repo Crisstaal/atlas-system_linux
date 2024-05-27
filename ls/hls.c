@@ -84,7 +84,6 @@ void list_dir(const char *path, int include_hidden) {
 
     separate_files(args, files, directory, &file_count, &d_count);
 
-   ]]
 
     /* Printing */
     printf("options = %d = ", options);
