@@ -5,8 +5,6 @@
 #include <errno.h>
 #include <string.h>
 
-void print_error(const char *msg);
-
 void list_dir(const char *path, int include_hidden, int list_long) {
     DIR *dir;
     struct dirent *entry;
