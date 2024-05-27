@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <string.h>
 
 /**
  * separate_files - it does this
