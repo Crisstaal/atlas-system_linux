@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <hls.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
