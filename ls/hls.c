@@ -60,21 +60,10 @@ int main(int argc, char *argv[]) {
                     exit(EXIT_FAILURE);
                 }
             } else {
-                struct stat path_stat;
-                if (lstat(argv[i], &path_stat) != 0) {
-                    fprintf(stderr, "./hls: cannot access %s: %s\n", argv[i], strerror(errno));
-                    exit_status = EXIT_FAILURE;
-                } else if (S_ISDIR(path_stat.st_mode)) {
-                    if (multiple) {
-                        printf("\n");
-                    }
                     list_dir(argv[i], include_hidden);
-                } else {
-                    printf("%s\n", argv[i]);
                 }
             }
         }
-    }
 
     return exit_status;
 }
