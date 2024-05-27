@@ -71,5 +71,5 @@ void dbg_print_binary(unsigned char r)
  */
 void sort_subentries(file_t **directory, int d_count)
 {
-	qsort(directory, (size_t)d_count);
+	qsort(directory, d_count, sizeof(file_t *), compare_files);
 }
