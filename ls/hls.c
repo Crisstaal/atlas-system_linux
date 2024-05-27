@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 	if (!args[0])
 		perror("fail"), exit(2);
 
-	separate_files(args, files, dirs, &file_count, &dir_count);
+	separate_files(args, files, directory, &file_count, &d_count);
 
 	_alphasort(files, file_count);
 
@@ -80,17 +80,17 @@ int main(int argc, char **argv)
 	dbg_printf("file count = %lu\n", file_count);
 	print_files_in_current_dir(files, file_count, options);
 
-	_alphasort(dirs, dir_count);
-	if (dir_count > 1)
+	_alphasort(directory, d_count);
+	if (d_count > 1)
 		puts("");
-	print_files_in_dirs(dirs, dir_count, options);
+	print_files_in_directory(directory, d_count, options);
 
 	for (i = 0; i < file_count; ++i)
 		free(files[i]);
-	for (i = 0; i < dir_count; ++i)
-		free(dirs[i]);
+	for (i = 0; i < d_count; ++i)
+		free(directory[i]);
 	free(files);
-	free(dirs);
+	free(directory);
 	free(args);
 
 	return (0);
