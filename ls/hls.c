@@ -5,17 +5,24 @@
 #include <errno.h>
 #include <string.h>
 
+/**
+* list_dir: directory listing
+* return: list
+*/
+
 void list_dir(const char *path, int include_hidden, int list_long) {
     DIR *dir;
     struct dirent *entry;
-
-    if (!(dir = opendir(path))) {
+    
+    if (!(dir = opendir(path)))
+    {
         printf("Cannot open directory");
         return;
     }
 
     while ((entry = readdir(dir)) != NULL) {
-        if (!include_hidden && entry->d_name[0] == '.') {
+        if (!include_hidden && entry->d_name[0] == '.')
+        {
             continue;
         }
         if (list_long) {
@@ -41,6 +48,11 @@ void list_dir(const char *path, int include_hidden, int list_long) {
 }
 
 
+/**
+* main - main function
+* argc - argument count
+* argv - number or arguments
+*/
 int main(int argc, char *argv[]) {
     int list_long = 0;
     int include_hidden = 0;
