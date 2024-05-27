@@ -45,26 +45,36 @@ int main(int argc, char *argv[]) {
     int list_long = 0;
     int include_hidden = 0;
     char *path = ".";
-    int i;
+    int i, j;
     DIR *dir = opendir(path);
     
-   if (argc < 2) {
-        list_dir(".", include_hidden);
-    } else {
-        for (i = 1; i < argc; i++) {
+    if (argc >1) {
+        i = 1;
+        while (i < argc) {
             if (argv[i][0] == '-') {
-                if (argv[i][1] == 'a' && argv[i][2] == '\0') {
-                    include_hidden = 1;
-                } else {
-                    fprintf(stderr, "./hls: invalid option -- '%s'\n", argv[i]);
-                    exit(EXIT_FAILURE);
+                for (j = 1; argv[i][j] != '\0'; j++) {
+                    switch (argv[i][j]) {
+                        case '1':
+                            list_long = 1;
+                            break;
+                        default:
+                            printf("invalid option");
+                            exit(EXIT_FAILURE);
+                    }
                 }
             } else {
-                    list_dir(argv[i], include_hidden);
-                }
+                path = argv[i];
             }
+            i++;
         }
+    }
+    if (dir) {
+        closedir(dir);
+        list_dir(path, include_hidden, list_long);
+    } else {
+        fprintf(stderr, "./hls_01: cannot access %s: %s\n", path, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 
-    return exit_status;
+    return EXIT_SUCCESS;
 }
-
