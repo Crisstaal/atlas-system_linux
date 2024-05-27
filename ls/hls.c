@@ -45,37 +45,37 @@ int main(int argc, char *argv[]) {
     int list_long = 0;
     int include_hidden = 0;
     char *path = ".";
-    int i, j;
+    int i;
     DIR *dir = opendir(path);
     
-    if (argc >1) {
-        i = 1;
-        while (i < argc) {
+   if (argc < 2) {
+        list_dir(".", include_hidden);
+    } else {
+        for (i = 1; i < argc; i++) {
             if (argv[i][0] == '-') {
-                for (j = 1; argv[i][j] != '\0'; j++) {
-                    switch (argv[i][j]) {
-                        case '1':
-                            list_long = 1;
-                            break;
-                        default:
-                            printf("invalid option");
-                            exit(EXIT_FAILURE);
-                    }
+                if (argv[i][1] == 'a' && argv[i][2] == '\0') {
+                    include_hidden = 1;
+                } else {
+                    fprintf(stderr, "./hls: invalid option -- '%s'\n", argv[i]);
+                    exit(EXIT_FAILURE);
                 }
             } else {
-                path = argv[i];
+                struct stat path_stat;
+                if (lstat(argv[i], &path_stat) != 0) {
+                    fprintf(stderr, "./hls: cannot access %s: %s\n", argv[i], strerror(errno));
+                    exit_status = EXIT_FAILURE;
+                } else if (S_ISDIR(path_stat.st_mode)) {
+                    if (multiple) {
+                        printf("\n");
+                    }
+                    list_dir(argv[i], include_hidden);
+                } else {
+                    printf("%s\n", argv[i]);
+                }
             }
-            i++;
         }
     }
-    if (dir) {
-        closedir(dir);
-        list_dir(path, include_hidden, list_long);
-    } else {
-        fprintf(stderr, "./hls_01: cannot access %s: %s\n", path, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
 
-    return EXIT_SUCCESS;
+    return exit_status;
 }
 
