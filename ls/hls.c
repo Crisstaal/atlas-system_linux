@@ -11,13 +11,13 @@
 * return: list
 */
 
-void list_dir(const char *path, int include_hidden, int list_long) {
+void list_dir(const char *path, int include_hidden) {
     DIR *dir;
     struct dirent *entry;
     
     if (!(dir = opendir(path)))
     {
-         fprintf(stderr, "./hls_01: cannot access %s: No such file or directory\n", path);
+        fprintf(stderr, "./hls: cannot access %s: %s\n", path, strerror(errno));
         return;
     }
 
@@ -28,8 +28,9 @@ void list_dir(const char *path, int include_hidden, int list_long) {
         {
             continue;
         }
-            printf("%s\n", entry->d_name);
+        printf("%s\n", entry->d_name);
     }
+    printf("\n");
 
     closedir(dir);
 }
