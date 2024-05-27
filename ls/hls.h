@@ -9,7 +9,6 @@
 #include <sys/types.h>
 #include <time.h>
 
-#else
 
 #define dbg_printf(...)
 #define dbg_print_binary(x)
