@@ -10,6 +10,9 @@ typedef struct {
     char option2;
 } option_t;
 
+
+typedef int option_t;
+
 typedef struct {
     char filename[256];
     int file_size;

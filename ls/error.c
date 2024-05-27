@@ -93,16 +93,22 @@ void parse_args(char **input_args, char **output_args, option_t *options)
  */
 void parse_opts(char *arg, option_t *options)
 {
+     OptionInfo OptionInfo[] = {
+        {'a', 1, "Option A debug message"},
+        {'b', 2, "Option B debug message"}
+     };
+     size_t i;
+
     while (*arg)
     {
         int found = 0;
         
-        for (size_t i = 0; i < sizeof(OptionInfo) / sizeof(OptionInfo[0]); ++i)
+        for (i = 0; i < sizeof(OptionInfo) / sizeof(OptionInfo[0]); ++i)
         {
             if (*arg == OptionInfo[i].flag)
             {
-                *options |= optionInfo[i].option;
-                dprintf(2, "%s\n" OptionInfo[i].debug_message);
+                *options |= OptionInfo[i].option;
+                dprintf(2, "%s\n", OptionInfo[i].debug_message);
                 found = 1;
                 break;
             }
