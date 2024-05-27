@@ -1,5 +1,5 @@
 #include "hls.h"
-
+#include <stdio.h>  
 /**
  * dbg_print_array - prints pathn
  * @array: the array
