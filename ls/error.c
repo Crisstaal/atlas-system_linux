@@ -78,5 +78,3 @@ void _alphasort(file_t **files, int file_count)
 {
 	_quicksort(files, (size_t)file_count);
 }
-
-/**

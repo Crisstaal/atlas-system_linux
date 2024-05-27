@@ -27,8 +27,9 @@
 #define dbg_printf printf
 #define SLICE(str, a, b) (str[b] = '\0', &str[a])
 typedef unsigned char option_t;
+typedef struct file_t file_t;
 
-typedef struct file_t
+typedef struct
 {
 	char *path;
 	struct stat statbuf;
