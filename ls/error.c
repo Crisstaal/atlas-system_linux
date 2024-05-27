@@ -91,35 +91,30 @@ void parse_args(char **input_args, char **output_args, option_t *options)
  * @arg: containing flag string
  * @options: options
  */
-void parse_opts(char *arg, option_t *options)
-{
-     OptionInfo OptionInfo[] = {
+vvoid parse_opts(char *arg, OptionInfo *options) {
+    OptionInfo OptionInfo[] = {
         {'a', 1, "Option A debug message"},
-        {'b', 2, "Option B debug message"}
-     };
-     size_t i;
+        {'b', 2, "Option B debug message"},
+        {'c', 3, "Option C debug message"}
+    };
 
-    while (*arg)
-    {
+    while (*arg) {
         int found = 0;
-        
-        for (i = 0; i < sizeof(OptionInfo) / sizeof(OptionInfo[0]); ++i)
-        {
-            if (*arg == OptionInfo[i].flag)
-            {
-                *options |= OptionInfo[i].option;
-                dprintf(2, "%s\n", OptionInfo[i].debug_message);
+
+        for (size_t i = 0; i < sizeof(OptionInfo) / sizeof(OptionInfo[0]); ++i) {
+            if (arg[0] == '-' && arg[1] == OptionInfo[i].option1 && arg[2] == '\0') {
+                printf("Option: %c, Option2: %d, Debug message: %s\n",
+                       OptionInfo[i].option1, OptionInfo[i].option2, OptionInfo[i].debug_message);
                 found = 1;
                 break;
             }
         }
-        
-        if (!found)
-        {
-            fprintf(stderr, "Unknown flag\n");
-            exit(2);
+
+        if (!found) {
+            fprintf(stderr, "Unknown flag: %s\n", arg);
+            exit(2); // Exit with an error code
         }
-        
+
         ++arg;
     }
 }
