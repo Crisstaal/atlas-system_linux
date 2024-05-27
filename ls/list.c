@@ -14,10 +14,13 @@ void list_directory(const char *dir, int op_l, int op_A) {
     File *head = NULL, *tail = NULL;
     int file_count = 0;
     char path[512];
+    path[0] ='\0';
     File *f = head;
     File *new_file;
-    size_t j, len, dir_len;
+    size_t j, len;
+    size_t dir_len = 0;
     File **file_array = NULL;
+    free_file_list(head);
     
     if (!dh) {
         fprintf(stderr, "hls: cannot open directory '%s': ", dir);
@@ -30,12 +33,14 @@ void list_directory(const char *dir, int op_l, int op_A) {
         dir_len++;
     }
 
-    if (dir_len >= sizeof(path) - 2) {
-        fprintf(stderr, "Directory path too long\n");
+    if (dir_len +len >= sizeof(path)) {
+        fprintf(stderr, "Path length exceeds buffer size\n");
+        closedir(dh);
+        free_file_list(head);
         exit(EXIT_FAILURE);
     }
 
-    sprintf(path, dir, dir_len);
+    sprintf(path, "%s", dir);
     path[dir_len] = '/';
     path[dir_len + 1] = '\0';
 
@@ -62,7 +67,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
             fprintf(stderr, "Path length exceeds buffer size\n");
             exit(EXIT_FAILURE);
         }
-        sprintf(path + dir_len + 1, d->d_name, len + 1);
+        sprintf(path, "%s%s", dir, d->d_name);
 
         if (lstat(path, &new_file->st) != 0) {
             perror("lstat");
