@@ -67,19 +67,21 @@ int main(int argc, char **argv)
 	/* options to be used*/
 	(void) argc;
 	parse_args(argv + 1, args, &options);
-	if (!args[0])
+	if (!args[0]) {
 		parse_args(def, args, &options);
-	if (!args[0])
+	}
+	if (!args[0]) {
 		perror("fail"), exit(2);
+	}
 
 	separate_files(args, files, directory, &file_count, &d_count);
 
 	_alphasort(files, file_count);
 
     /*printing*/
-	dbg_printf("options = %d = ", options);
-	dbg_print_binary(options);
-	dbg_printf("file count = %lu\n", file_count);
+	printf("options = %d = ", options);
+	print_binary(options);
+	printf("file count = %lu\n", file_count);
 
 	print_files_in_current_dir(files, file_count, options);
 
