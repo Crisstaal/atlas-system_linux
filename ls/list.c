@@ -16,7 +16,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
     int file_count = 0;
     char path[512];
     path[0] ='\0';
-    size_t j, len, f;
+    size_t j, len;
     size_t dir_len = 0;
     File **file_array = NULL;
     free_file_list(head);
