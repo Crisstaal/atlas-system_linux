@@ -127,7 +127,7 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
 {
 	size_t i, j;
 
-	for (i = 0; i< d_count; ++i)
+	for (i = 0; i< count; ++i)
 	{
 		file_t *dom = directory[i];
 		size_t sub_count = 0;
@@ -146,12 +146,12 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
 		sort_subentries(dom->subentries, sub_count);
 		print_subentries(dom, sub_count, (size_t)count, options);
 
-		if (i < (d_count - 1))
+		if (i < (count - 1))
 			puts("");
 
 		{
 
-			for (j = 0; < sub_count; ++j)
+			for (j = 0;j < sub_count; ++j)
 				free(dom->subentries[j]);
 			free(dom->subentries);
 		}
