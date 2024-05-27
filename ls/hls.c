@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
 
     /*Copy command-line arguments to args*/
     for (j = 0; j < argc; j++) {
-        args[j] = argv[j];
+        argc[j] = argv[j];
     }
 
 
