@@ -111,7 +111,7 @@ void list_dir(const char *path, int include_hidden) {
 
     return (0);
 }
-}
+
 
 /**
  * _calloc - allocates memory
