@@ -2,7 +2,7 @@
 #include <stddef.h>
 
 
- * swap - swaps two files
+ /* swap - swaps two files
  * @a: pointer
  * @b: pointer
  * Return: void

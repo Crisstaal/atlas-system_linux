@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 	option_t options = NONE;
 	char **args = _calloc(BUFSIZE, sizeof(args));
 	file_t **files = malloc(sizeof(**files) * BUFSIZE);
-	file_t **dirs = malloc(sizeof(**dirs) * BUFSIZE);
+	file_t **directory = malloc(sizeof(**directory) * BUFSIZE);
 
 	/* options to be used*/
 	(void) argc;
