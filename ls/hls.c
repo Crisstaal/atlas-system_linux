@@ -57,6 +57,7 @@ void list_dir(const char *path, int include_hidden) {
 int main(int argc, char **argv) {
     char **args = calloc(BUFSIZE, sizeof(*args));
     option_t options = NONE;
+    int j;
     size_t i, file_count = 0, d_count = 0;
      file_t **files = malloc(sizeof(**files) * BUFSIZE);
     file_t **directory = malloc(sizeof(**directory) * BUFSIZE);
@@ -73,8 +74,8 @@ int main(int argc, char **argv) {
     }
 
     /*Copy command-line arguments to args*/
-    for (i = 0; i < argc; i++) {
-        args[i] = argv[i];
+    for (j = 0; j < argc; j++) {
+        args[j] = argv[j];
     }
 
 
