@@ -60,9 +60,9 @@ int main(int argc, char **argv) {
     size_t i, file_count = 0, d_count = 0;
      file_t **files = malloc(sizeof(**files) * BUFSIZE);
     file_t **directory = malloc(sizeof(**directory) * BUFSIZE);
-    char **args = malloc(argc * sizeof(char *));
+    char **args = malloc(argc + 1) *(sizeof(char *));
     
-    if (files == NULL || directory == NULL) {
+    if (files == NULL || directory == NULL || args == NULL) {
         perror("Memory allocation error");
         free(files);
         free(directory);
@@ -90,13 +90,13 @@ int main(int argc, char **argv) {
 
 
     /* Printing */
-    printf("options = %d = ", options);
+    printf("options = %d\n", options);
     printf("file count = %lu\n", file_count);
 
     print_files_in_current_dir(files, file_count, options);
 
     
-    if (d_count > 1) {
+    if (d_count > 0) {
         puts("");
     }
     print_files_in_directory(directory, d_count, options);
@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
     free(directory);
     free(args);
 
-    return (0);
+    return EXIT_SUCCESS;
 }
 
 
