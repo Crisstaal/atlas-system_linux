@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
             list_dir(path, include_hidden, list_long);
         }
     } else {
-        printf(strerror(errno));
+        fprintf(strerror(errno));
         exit(EXIT_FAILURE);
     }
 
