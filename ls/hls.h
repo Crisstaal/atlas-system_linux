@@ -23,7 +23,6 @@
 
 
 #define BUFSIZE 1024
-#define dbg_printf printf
 #define SLICE(str, a, b) (str[b] = '\0', &str[a])
 typedef unsigned char option_t;
 typedef struct file_t file_t;
@@ -33,7 +32,6 @@ typedef struct
 	char *path;
 	struct stat statbuf;
 	int is_dir;
-	struct file_t **subentries;
 } file_t;
 
 struct file_node_t
@@ -51,8 +49,8 @@ void print_subentries(file_t *, size_t, size_t, option_t);
 void print_files_in_directory(file_t **, size_t, option_t);
 /* error.c */
 void dbg_print_binary(unsigned char);
-void dbg_print_file_array(file_t **, size_t);
-void dbg_swap(file_t **, file_t **, file_t **, size_t);
+void dbg_print_array(file_t **array, size_t size)
+void dbg_swap(file_t **a, file_t **b, file_t **array, size_t size)
 void _quicksort(file_t **, size_t);
 void _alphasort(file_t **, int);
 void sort_subentries(file_t **, int);
