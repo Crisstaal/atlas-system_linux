@@ -4,7 +4,6 @@
 #include <dirent.h>
 
 typedef enum {
-typedef enum {
     NORMAL = 0,
     CASE_INSENSITIVE = 1 << 0,
     REVERSE = 1 << 1

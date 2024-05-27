@@ -1,6 +1,7 @@
 #include <stdio.h>
-#inlude "hls.h"
-
+#include "hls.h"
+#include <stdlib.h>
+#include "options.h"
 
 void *_memset(void *c, int a, size_t b)
 {
@@ -13,6 +14,7 @@ void *_memset(void *c, int a, size_t b)
 
     return c;
 }
+/**
 * print_error- print error
 * return: error
 */
@@ -31,7 +33,7 @@ void print_error(const char *msg)
 void *_calloc(unsigned int nmemb, unsigned int size)
 {
 	
-    if (nmemb != 0 && size > SIZE_MAX / nmemb) {
+    if (nmemb != 0 && size > _SIZE_MAX_ / nmemb) {
         return NULL;
     }
 
@@ -57,6 +59,11 @@ int my_strcmp(const char *str1, const char *str2)
     return *str1 - *str2;
 }
 
+/**
+* parse_args - parse args
+*@option_t - options
+*@input_args - put in args
+*/
 void parse_args(char **input_args, char **output_args, option_t *options)
 {
     size_t input_index = 0, output_index = 0;
