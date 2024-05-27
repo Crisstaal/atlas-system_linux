@@ -11,6 +11,7 @@
 * @path - path
 * return: list
 */
+/*
 void list_dir(const char *path, int include_hidden) {
     DIR *dir;
     struct dirent *entry;
@@ -51,7 +52,7 @@ void list_dir(const char *path, int include_hidden) {
 
     closedir(dir);
 }
-
+*/
 int main(int argc, char *argv[]) {
     char *path;
     int i, j;

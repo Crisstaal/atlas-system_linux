@@ -32,22 +32,18 @@ void print_error(const char *msg)
  */
 void *_calloc(unsigned int nmemb, unsigned int size)
 {
-    void *ptr = malloc(bytes);
-    size_t bytes = nmemb * size;
-	
-    if (nmemb != 0 && size > __SIZE_MAX__ / nmemb) {
-        return NULL;
-    }
+	void *ret;
+	size_t bytes;
 
-    if (bytes == 0) {
-        return NULL;
-    }
+	bytes = nmemb * size;
+	if (!bytes)
+		return (NULL);
 
-    if (!ptr) {
-        return NULL;
-    }
+	ret = malloc(bytes);
+	if (ret)
+		return (_memset(ret, 0, bytes));
 
-    return _memset(ptr, 0, bytes);
+	return (NULL);
 }
 
 int my_strcmp(const char *str1, const char *str2)
@@ -91,31 +87,37 @@ void parse_args(char **input_args, char **output_args, option_t *options)
  * @arg: containing flag string
  * @options: options
  */
-void parse_opts(char *arg, OptionInfo *option) {
-    OptionInfo OptionInfo[] = {
-        {'a', 1, "Option A debug message"},
-        {'b', 2, "Option B debug message"},
-        {'c', 3, "Option C debug message"}
-    };
-
-
-    while (*arg) {
-        int found = 0;
-
-        for (size_t i = 0; i < sizeof(OptionInfo) / sizeof(OptionInfo[0]); ++i) {
-            if (arg[0] == '-' && arg[1] == OptionInfo[i].option && arg[2] == '\0') {
-                printf("Option: %c, Option2: %d, Debug message: %s\n",
-                       OptionInfo[i].option, OptionInfo[i].option, OptionInfo[i].debug_message);
-                found = 1;
-                break;
-            }
-        }
-
-        if (!found) {
-            fprintf(stderr, "Unknown flag: %s\n", arg);
-            exit(2); // Exit with an error code
-        }
-
-        ++arg;
-    }
+oid parse_opts(char *arg, option_t *options)
+{
+	while (*++arg)
+	{
+		switch (*arg)
+		{
+		case '1':
+			*options |= ONEPERLINE;
+			dbg_printf("parse_opts:\n\tcase %c\n", '1');
+			break;
+		case 'a':
+			*options |= ALL;
+			dbg_printf("parse_opts:\n\tcase %c\n", 'a');
+			break;
+		case 'A':
+			*options |= ALMOSTALL;
+			dbg_printf("parse_opts:\n\tcase %c\n", 'A');
+			break;
+		case 'h':
+			*options |= HUMAN;
+			dbg_printf("parse_opts:\n\tcase %c\n", 'h');
+			break;
+		case 'l':
+			*options |= LISTING;
+			dbg_printf("parse_opts:\n\tcase %c\n", 'l');
+			break;
+		default:
+			dbg_printf("TODO: handle bad flag\n");
+			fprintf(stderr, "Unknown flag\n");
+			exit(2);
+			break;
+		}
+	}
 }

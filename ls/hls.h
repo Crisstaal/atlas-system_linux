@@ -5,22 +5,26 @@
 #include <dirent.h>
 #include <stdio.h>
 
+#define BUFSIZE 1024
+
 typedef struct {
     int option1;
     char option2;
 } option_t;
 
 
-typedef struct {
-    char filename[256];
-    int file_size;
+typedef struct file_t
+{
+	char *path;
+	struct stat statbuf;
+	int is_dir;
+	struct file_t **subentries;
 } file_t;
 
 /*Struct to hold option data*/
 typedef struct {
     char flag;
     option_t option;
-    const char *debug_message;
 } OptionInfo;
 
 
@@ -29,6 +33,7 @@ void print_error(const char *msg);
 void *_memset(void *c, int a, size_t b);
 void list_dir(const char *path, int include_hidden);
 int is_hidden(const char *name);
+void *_calloc(unsigned int nmemb, unsigned int size)
 void print_file_info(const char *filename);
 int my_strcmp(const char *str1, const char *str2);
 void parse_opts(char *arg, option_t *options);
