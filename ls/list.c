@@ -33,7 +33,7 @@ void list_directory(const char *dir, int op_l, int op_A) {
         dir_len++;
     }
 
-    if (dir_len + 1 + len >= sizeof(path)) {
+    if (dir_len + 1 >= sizeof(path)) {
         fprintf(stderr, "Path length exceeds buffer size\n");
         closedir(dh);
         free_file_list(head);
