@@ -11,7 +11,6 @@ int main(int argc, char *argv[]) {
     int op_l = 0, op_A = 0;
     int i;
     int start = 1;
-    char dir;
 
     /*Parse command line arguments*/
     for (i = 1; i < argc; i++) {
@@ -27,7 +26,7 @@ int main(int argc, char *argv[]) {
                 p++;
             }
         } else {
-            dir = argv[i];
+           char *dir = argv[i];
         }
     }
 
