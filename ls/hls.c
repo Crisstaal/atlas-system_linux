@@ -54,24 +54,27 @@ void list_dir(const char *path, int include_hidden) {
 }
 */
 
-	int main(int argc, char **argv) {
+int main(int argc, char **argv) {
+    char **args = calloc(BUFSIZE, sizeof(*args));
+    size_t i;
+    size_t file_count = 0, d_count = 0;
+    
     if (argc < 2) {
         printf("Usage: %s <directory>\n", argv[0]);
         return 1;
     }
 
-    char **args = calloc(BUFSIZE, sizeof(*args));
+
     if (args == NULL) {
         perror("Memory allocation error");
         return 2;
     }
 
     /*Copy command-line arguments to args*/
-    for (int i = 0; i < argc; i++) {
+    for (i = 0; i < argc; i++) {
         args[i] = argv[i];
     }
 
-    size_t i, file_count = 0, d_count = 0;
     option_t options = NONE;
     file_t **files = malloc(sizeof(**files) * BUFSIZE);
     file_t **directory = malloc(sizeof(**directory) * BUFSIZE);
