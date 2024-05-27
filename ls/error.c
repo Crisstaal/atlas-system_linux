@@ -98,12 +98,12 @@ void parse_opts(char *arg, option_t *options)
     {
         int found = 0;
         
-        for (size_t i = 0; i < sizeof(optionInfo) / sizeof(optionInfo[0]); ++i)
+        for (size_t i = 0; i < sizeof(OptionInfo) / sizeof(optionInfo[0]); ++i)
         {
             if (*arg == optionInfo[i].flag)
             {
                 *options |= optionInfo[i].option;
-                dbg_printf(optionInfo[i].debug_message, *arg);
+                d_printf(optionInfo[i].debug_message, *arg);
                 found = 1;
                 break;
             }
