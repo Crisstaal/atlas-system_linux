@@ -66,10 +66,6 @@ int main(int argc, char **argv)
 
 	/* options to be used*/
 	(void) argc;
-	parse_args(argv + 1, args, &options);
-	if (!args[0]) {
-		parse_args(def, args, &options);
-	}
 	if (!args[0]) {
 		perror("fail"), exit(2);
 	}

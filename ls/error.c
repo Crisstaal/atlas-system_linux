@@ -73,8 +73,3 @@ void sort_subentries(file_t **directory, int d_count)
 {
 	_alphasort(directory, (size_t)d_count);
 }
-
-void _alphasort(file_t **files, int file_count)
-{
-	_quicksort(files, (size_t)file_count);
-}
