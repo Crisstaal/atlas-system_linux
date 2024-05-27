@@ -1,44 +1,77 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <errno.h>
 #include <string.h>
-#include "hls.h"
 
-void print_usage_and_exit(const char *program_name) {
-    fprintf(stderr, "Usage: %s [-l] [-A] [directory1 directory2 ...]\n", program_name);
-    exit(EXIT_FAILURE);
-}
-int main(int argc, char *argv[]) {
-    int op_l = 0, op_A = 0;
-    int i;
-    int start = 1;
+void print_error(const char *msg);
 
-    /*Parse command line arguments*/
-    for (i = 1; i < argc; i++) {
-        if (argv[i][0] == '-') {
-            const char *p = argv[i] + 1;
-            while (*p) {
-                if (*p == 'l') op_l = 1;
-                else if (*p == 'A') op_A = 1;
-                else {
-                    fprintf(stderr, "hls: invalid option -- '%c'\n", *p);
-                    exit(EXIT_FAILURE);
-                }
-                p++;
+void list_dir(const char *path, int include_hidden, int list_long) {
+    DIR *dir;
+    struct dirent *entry;
+
+    if (!(dir = opendir(path))) {
+        print_error("Cannot open directory");
+        return;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (!include_hidden && entry->d_name[0] == '.') {
+            continue;
+        }
+        if (list_long) {
+            struct stat sb;
+            char fullpath[1024];
+            sprintf(fullpath, "%s/%s", path, entry->d_name);
+
+            if (lstat(fullpath, &sb) == -1) {
+                print_error("Error getting file status");
+                continue;
             }
+
+            printf("%s\n", entry->d_name);
         } else {
-           char *dir = argv[i];
+            printf("%s ", entry->d_name);
         }
     }
 
-    /* Handle multiple directories or files*/
-    for (i = 1; i < argc; i++) {
-        if (argv[i][0] != '-') {
-            if (start) start = 0;
-            else printf("\n");
-            printf("%s:\n", argv[i]);
-            list_directory(argv[i], op_l, op_A);
+    closedir(dir);
+    if (!list_long) {
+        printf("\n");
+    }
+}
+
+
+int main(int argc, char *argv[]) {
+    int list_long = 0;
+    char *path;
+    int i, j;
+
+    if (argc == 1) {
+        path = ".";
+    } else {
+        i = 1;
+        while (i < argc) {
+            if (argv[i][0] == '-') {
+                for (j = 1; argv[i][j] != '\0'; j++) {
+                    switch (argv[i][j]) {
+                        case '1':
+                            list_long = 1;
+                            break;
+                        default:
+                            fprintf(stderr, "hls: invalid option -- '%c'\n", argv[i][j]);
+                            exit(EXIT_FAILURE);
+                    }
+                }
+            } else {
+                path = argv[i];
+            }
+            i++;
         }
     }
 
-    return 0;
+    list_dir(path, list_long);
+
+    return EXIT_SUCCESS;
 }
