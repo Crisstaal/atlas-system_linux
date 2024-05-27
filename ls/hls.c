@@ -67,11 +67,6 @@ int main(int argc, char **argv) {
     }
 
 
-    if (args == NULL) {
-        perror("Memory allocation error");
-        return 2;
-    }
-
     /*Copy command-line arguments to args*/
     for (j = 0; j < argc; j++) {
         args[j] = argv[j];
