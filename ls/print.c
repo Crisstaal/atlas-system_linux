@@ -37,7 +37,7 @@ void print_array(file_t **array, size_t size, FILE *stream)
         if (i > 0)
             fprintf(stream, ", ");
         if (array[i] != NULL)
-            fprintf(stream, "%s");
+            fprintf(stream, "%s", array[i]->data);
         else
             fprintf(stream, "NULL");
     }

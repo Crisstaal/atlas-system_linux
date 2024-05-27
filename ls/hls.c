@@ -3,6 +3,8 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include "hls.h"
+#include <errno.h>
+#include <string.h>
 
 /**
 * list_dir-  directory listing
@@ -15,28 +17,37 @@ void list_dir(const char *path, int include_hidden) {
     
     if (!(dir = opendir(path)))
     {
-        fprintf(stderr, "./hls: cannot access %s: %s\n", path, perror(errno));
+       perror("opendir");
         return;
     }
-  if (!(dir = opendir(path))) {
-        printf(perror(errno));
-    }
-
     while ((entry = readdir(dir)) != NULL) {
-        if (list_dir) {
+        if (!include_hidden && entry->d_name[0] == '.') {
+            continue;
+        }
+
             struct stat sb;
-            char fullpath[1024]; // Adjust size as needed
-            snprintf(fullpath, sizeof(fullpath), "%s/%s", path, entry->d_name);
+            char fullpath[1024];
+            sprintf(fullpath, sizeof(fullpath), "%s/%s", path, entry->d_name);
 
             if (lstat(fullpath, &sb) == -1) {
-                print_error(strerror(errno));
-            }
-
-            printf("%s\n", entry->d_name);
-        } else {
-            printf("%s ", entry->d_name);
+            perror("lstat");
+            continue;
         }
+
+        printf("%s", entry->d_name);
+
+        if (S_ISLNK(sb.st_mode)) {
+            char link_target[1024];
+            ssize_t len = readlink(fullpath, link_target, sizeof(link_target) - 1);
+            if (len != -1) {
+                link_target[len] = '\0';
+                printf(" -> %s", link_target);
+            }
+        }
+
+        printf("\n");
     }
+
 
     closedir(dir);
 }
