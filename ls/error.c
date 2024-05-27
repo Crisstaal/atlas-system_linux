@@ -64,12 +64,4 @@ void dbg_print_binary(unsigned char r)
 	}
 	putchar('\n');
 }
-/**
- * sort_subentries - sorts an array l
- * @directory: directory
- * @d_count: count
- */
-void sort_subentries(file_t **directory, int d_count)
-{
-	qsort(directory, d_count, sizeof(file_t *), compare_files);
-}
+
