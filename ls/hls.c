@@ -9,7 +9,6 @@ void print_usage_and_exit(const char *program_name) {
 }
 int main(int argc, char *argv[]) {
     int op_l = 0, op_A = 0;
-    const char *dir = ".";
     int i;
     int start = 1;
 
