@@ -1,7 +1,9 @@
 #ifndef HLS_H
 #define HLS_H
 
+
 #include <dirent.h>
+#include <stdio.h>
 
 typedef struct {
     int option1;

@@ -1,4 +1,5 @@
 #include "hls.h"
+#include <stdio.h>
 /**
  * print_swap - swaps two values in file
  * @a: first value
