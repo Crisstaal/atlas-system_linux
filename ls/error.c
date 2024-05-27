@@ -7,5 +7,5 @@
 */
 void print_error(const char *msg)
 {
-    printf("hls: %s\n", msg);
+    fprintf(stderr,"hls: %s\n", msg);
 }

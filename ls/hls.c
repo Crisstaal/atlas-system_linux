@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
                             list_long = 1;
                             break;
                         default:
-                            fprintf(stderr, "hls: invalid option -- '%c'\n", argv[i][j]);
+                            printf("invalid option");
                             exit(EXIT_FAILURE);
                     }
                 }
@@ -87,7 +87,18 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    list_dir(path, include_hidden,list_long);
+    struct stat path_stat;
+    if (stat(path, &path_stat) != -1) {
+        if (S_ISREG(path_stat.st_mode)) {
+            printf("[Got]\n");
+            printf("%s\n", path);
+        } else if (S_ISDIR(path_stat.st_mode)) {
+            list_dir(path, include_hidden, list_long);
+        }
+    } else {
+        printf(strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 
     return EXIT_SUCCESS;
 }
