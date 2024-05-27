@@ -63,8 +63,14 @@ void list_directory(const char *dir, int op_l, int op_A) {
         new_file->name[j] = '\0';
 
         len = strlen(d->d_name);
+        while (d->d_name[len] != '\0')
+        {
+            len++;
+        }
         if (dir_len + 1 + len >= sizeof(path)) {
             fprintf(stderr, "Path length exceeds buffer size\n");
+            closedir(dh);
+            free_file_list(head);
             exit(EXIT_FAILURE);
         }
         sprintf(path, "%s%s", dir, d->d_name);
