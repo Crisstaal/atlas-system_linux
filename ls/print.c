@@ -111,7 +111,7 @@ void print_subentries(file_t *dom,size_t sub_count,size_t d_count, option_t opti
 		{
 			continue;
 		}
-		buf += sprintf(buf, "%s%s", dom->subentries[i]->path, sep);
+		buf += printf(buf, "%s%s", dom->subentries[i]->path, sep);
 	}
 	if (buf != start)
 		puts(start);
