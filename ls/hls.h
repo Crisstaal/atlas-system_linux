@@ -22,6 +22,8 @@
 #define SLICE(str, a, b) (str[b] = '\0', &str[a])
 typedef unsigned char option_t;
 
+const char *program_name;
+
 typedef struct file_t
 {
 	char *path;
