@@ -139,7 +139,7 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
 
 		if (dir == NULL)
         {
-            fprintf(stderr, "%s: cannot acess %s: %s\n", program_name, dom->path);
+            fprintf(stderr, "%s: cannot acess %s: %s\n", program_name, dom->path, strerror(errno));
             continue;
         }
 
