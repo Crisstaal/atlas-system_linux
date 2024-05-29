@@ -23,7 +23,7 @@ void separate_files(char **args,file_t **files, file_t **directory,size_t *file_
 	{
 		file_t *f = malloc(sizeof(*f));
 
-		if(f==NULL)
+		if(f == NULL)
 		{
 			perror("malloc");
 			exit(EXIT_FAILURE);
@@ -46,6 +46,31 @@ void separate_files(char **args,file_t **files, file_t **directory,size_t *file_
 			directory[(*d_count)++] = f;
 		}
 	}
+}
+
+/**
+ * print_files_in_current_dir - it does this
+ * @files: files
+ * @file_count: counts
+ * @options:
+ */
+void print_files_in_current_dir(file_t **files, size_t file_count, option_t options)
+{
+	size_t i = 0;
+
+	for (; i < file_count; ++i)
+	{
+		file_t *f = files[i];
+	
+
+		if ((!(options & ALL) &&((_strcmp(f->path, ".") == 0) ||
+		    ((_strcmp(f->path, "..") == 0)))))
+		{
+			continue;
+		}
+		printf("%s\n", f->path);
+	}
+	
 }
 
 void read_subentries(DIR *dirp, file_t *dom, size_t *sub_count)
@@ -91,34 +116,28 @@ void read_subentries(DIR *dirp, file_t *dom, size_t *sub_count)
  */
 void print_subentries(file_t *dom,size_t sub_count,size_t d_count, option_t options)
 {
-	char *buf = malloc(sizeof(*buf) * BUFSIZE);
-	char *start = buf;
 	size_t i = 0;
-
-	if (buf == NULL)
-	{
-		perror("malloc");
-		exit(EXIT_FAILURE);
-	}
 
 
 	if (d_count > 1)
+	{
 		printf("%s:\n", dom->path);
+	}
+
 	for (; i < sub_count; ++i)
 	{
 		char *path = dom->subentries[i]->path;
-		char *sep = (options & ONEPERLINE) ? "\n" : "  ";
 
 		if ((!(options & ALL) &&((_strcmp(path, ".") == 0) ||((_strcmp(path, "..") == 0)))))
 		{
 			continue;
 		}
-		buf += printf(buf, "%s%s", dom->subentries[i]->path, sep);
+
+		printf("%s\n", path);
+		
 	}
-	if (buf != start)
-		puts(start);
-	free(start);
 }
+	
 
 
 /**
@@ -143,7 +162,7 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
             continue;
         }
 
-		dom->subentries = malloc(sizeof(dom->subentries) * BUFSIZE);
+		dom->subentries = malloc(sizeof(*dom->subentries) * BUFSIZE);
 
 		if(dom->subentries == NULL)
 		{
@@ -156,51 +175,12 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
 
 		print_subentries(dom, sub_count, (size_t)count, options);
 
-		if (i < (count - 1))
-			puts("");
-
+		for (j = 0; j < sub_count; ++j)
 		{
-
-			for (j = 0; j < sub_count; ++j)
-				free(dom->subentries[j]);
-			free(dom->subentries);
+			free(dom->subentries[j]->path);
+			free(dom->subentries[j]);
+		}
+		free(dom->subentries);
 		closedir(dir);
-		}
 	}
 }
-/**
- * print_files_in_current_dir - it does this
- * @files: files
- * @file_count: counts
- * @options:
- */
-void print_files_in_current_dir(file_t **files, size_t file_count, option_t options)
-{
-	char *buf = malloc(sizeof(*buf) * BUFSIZE);
-	char *start = buf;
-	size_t i = 0;
-
-	if (buf == NULL)
-	{
-		perror("malloc");
-		exit(EXIT_FAILURE);
-	}
-
-	for (; i < file_count; ++i)
-	{
-		file_t *f = files[i];
-		
-		char *sep = (options & ONEPERLINE) ? "\n" : "  ";
-
-		if ((!(options & ALL) &&((_strcmp(f->path, ".") == 0) ||
-		    ((_strcmp(f->path, "..") == 0)))))
-		{
-			continue;
-		}
-		buf += sprintf(buf, "%s%s", f->path, sep);
-	}
-	if (buf != start)
-		puts(start);
-	free(start);
-}
-
