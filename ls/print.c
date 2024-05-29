@@ -32,7 +32,7 @@ void separate_files(char **args,file_t **files, file_t **directory,size_t *file_
 		f->path = args[i];
 		if (lstat(f->path, &f->statbuf) == -1)
 		{
-			printf(stderr, "%s: cannot access %s: %s\n", program_name, f-> path);
+			sprintf(stderr, "%s: cannot access %s: %s\n", program_name, f-> path);
 			free(f);
 			continue;
 		}
@@ -174,7 +174,7 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
 
 		if (dir == NULL)
         {
-            printf(stderr, "%s: cannot acess %s: %s\n", program_name, dom->path);
+            sprintf(stderr, "%s: cannot acess %s: %s\n", program_name, dom->path);
             continue;
         }
 
