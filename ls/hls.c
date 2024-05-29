@@ -80,6 +80,9 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
+    program_name = argv[0];
+
+
     /*Copy command-line arguments to args*/
     for (j = 0; j < argc; j++) {
         args[j] = argv[j];
