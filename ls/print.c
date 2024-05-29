@@ -32,7 +32,7 @@ void separate_files(char **args,file_t **files, file_t **directory,size_t *file_
 		f->path = args[i];
 		if (lstat(f->path, &f->statbuf) == -1)
 		{
-			sprintf(stderr, "%s: cannot access %s: %s\n", program_name, f-> path);
+			fprintf(stderr, "%s: cannot access %s: %s\n", program_name, f-> path, strerror(errno));
 			free(f);
 			continue;
 		}
@@ -47,43 +47,6 @@ void separate_files(char **args,file_t **files, file_t **directory,size_t *file_
 		}
 	}
 }
-
-/**
- * print_files_in_current_dir - it does this
- * @files: files
- * @file_count: counts
- * @options:
- */
-void print_files_in_current_dir(file_t **files, size_t file_count, option_t options)
-{
-	char *buf = malloc(sizeof(*buf) * BUFSIZE);
-	char *start = buf;
-	size_t i = 0;
-
-	if (buf == NULL)
-	{
-		perror("malloc");
-		exit(EXIT_FAILURE);
-	}
-
-	for (; i < file_count; ++i)
-	{
-		file_t *f = files[i];
-		
-		char *sep = (options & ONEPERLINE) ? "\n" : "  ";
-
-		if ((!(options & ALL) &&((_strcmp(f->path, ".") == 0) ||
-		    ((_strcmp(f->path, "..") == 0)))))
-		{
-			continue;
-		}
-		buf += sprintf(buf, "%s%s", f->path, sep);
-	}
-	if (buf != start)
-		puts(start);
-	free(start);
-}
-
 
 void read_subentries(DIR *dirp, file_t *dom, size_t *sub_count)
 {
@@ -108,7 +71,7 @@ void read_subentries(DIR *dirp, file_t *dom, size_t *sub_count)
 
 		if (lstat(sub->path, &sub->statbuf) == -1)
 		{
-			perror(sub->path);
+			fprintf(stderr, "%s: cannot access %s: %s\n", program_name, sub->path, strerror(errno));
 			free(sub->path);
 			free(sub);
 			continue;
@@ -117,6 +80,7 @@ void read_subentries(DIR *dirp, file_t *dom, size_t *sub_count)
 		dom->subentries[(*sub_count)++] = sub;
 	}
 }
+
 
 /**
  * print_subentries - print
@@ -156,6 +120,7 @@ void print_subentries(file_t *dom,size_t sub_count,size_t d_count, option_t opti
 	free(start);
 }
 
+
 /**
  * print_files_in_directory - print
  * @directory: directory
@@ -174,7 +139,7 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
 
 		if (dir == NULL)
         {
-            sprintf(stderr, "%s: cannot acess %s: %s\n", program_name, dom->path);
+            fprintf(stderr, "%s: cannot acess %s: %s\n", program_name, dom->path);
             continue;
         }
 
@@ -203,3 +168,39 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
 		}
 	}
 }
+/**
+ * print_files_in_current_dir - it does this
+ * @files: files
+ * @file_count: counts
+ * @options:
+ */
+void print_files_in_current_dir(file_t **files, size_t file_count, option_t options)
+{
+	char *buf = malloc(sizeof(*buf) * BUFSIZE);
+	char *start = buf;
+	size_t i = 0;
+
+	if (buf == NULL)
+	{
+		perror("malloc");
+		exit(EXIT_FAILURE);
+	}
+
+	for (; i < file_count; ++i)
+	{
+		file_t *f = files[i];
+		
+		char *sep = (options & ONEPERLINE) ? "\n" : "  ";
+
+		if ((!(options & ALL) &&((_strcmp(f->path, ".") == 0) ||
+		    ((_strcmp(f->path, "..") == 0)))))
+		{
+			continue;
+		}
+		buf += sprintf(buf, "%s%s", f->path, sep);
+	}
+	if (buf != start)
+		puts(start);
+	free(start);
+}
+
