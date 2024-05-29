@@ -20,8 +20,19 @@ void separate_files(char **args,file_t **files, file_t **directory,size_t *file_
 	{
 		file_t *f = malloc(sizeof(*f));
 
+		if(f==NULL)
+		{
+			perror("malloc");
+			exit(EXIT_FAILURE);
+		}
+
 		f->path = args[i];
-		lstat(f->path, &f->statbuf);
+		if (lstat(f->path, &f->statbuf) == -1)
+		{
+			perror(f->path);
+			free(f);
+			continue;
+		}
 		f->is_dir = S_ISDIR(f->statbuf.st_mode);
 		if (!f->is_dir)
 		{
@@ -40,13 +51,17 @@ void separate_files(char **args,file_t **files, file_t **directory,size_t *file_
  * @file_count: counts
  * @options:
  */
-void print_files_in_current_dir(file_t **files,
-				size_t file_count,
-				option_t options)
+void print_files_in_current_dir(file_t **files, size_t file_count, option_t options)
 {
 	char *buf = malloc(sizeof(*buf) * BUFSIZE);
 	char *start = buf;
 	size_t i = 0;
+
+	if (buf == NULL)
+	{
+		perror("malloc");
+		exit(EXIT_FAILURE);
+	}
 
 	for (; i < file_count; ++i)
 	{
@@ -54,8 +69,7 @@ void print_files_in_current_dir(file_t **files,
 		
 		char *sep = (options & ONEPERLINE) ? "\n" : "  ";
 
-		if ((!(options & ALL) &&
-		    ((_strcmp(f->path, ".") == 0) ||
+		if ((!(options & ALL) &&((_strcmp(f->path, ".") == 0) ||
 		    ((_strcmp(f->path, "..") == 0)))))
 		{
 			continue;
@@ -68,18 +82,34 @@ void print_files_in_current_dir(file_t **files,
 }
 
 
-void read_subentries(DIR *dirp,
-		     file_t *dom,
-		     size_t *sub_count)
+void read_subentries(DIR *dirp, file_t *dom, size_t *sub_count)
 {
 	struct dirent *d;
 
 	while ((d = readdir(dirp)) != NULL)
 	{
 		file_t *sub = malloc(sizeof(*sub));
+		if (sub == NULL)
+		{
+			perror("malloc");
+			exit(EXIT_FAILURE);
+		}
 
 		sub->path = strdup(d->d_name);
-		lstat(sub->path, &sub->statbuf);
+		if (sub->path == NULL)
+		{
+			perror("strdup");
+			free(sub);
+			exit(EXIT_FAILURE);
+		}
+
+		if (lstat(sub->path, &sub->statbuf) == -1)
+		{
+			perror(sub->path);
+			free(sub->path);
+			free(sub);
+			continue;
+		}
 		sub->is_dir = S_ISDIR(sub->statbuf.st_mode);
 		dom->subentries[(*sub_count)++] = sub;
 	}
@@ -98,6 +128,13 @@ void print_subentries(file_t *dom,size_t sub_count,size_t d_count, option_t opti
 	char *start = buf;
 	size_t i = 0;
 
+	if (buf == NULL)
+	{
+		perror("malloc");
+		exit(EXIT_FAILURE);
+	}
+
+
 	if (d_count > 1)
 		printf("%s:\n", dom->path);
 	for (; i < sub_count; ++i)
@@ -105,9 +142,7 @@ void print_subentries(file_t *dom,size_t sub_count,size_t d_count, option_t opti
 		char *path = dom->subentries[i]->path;
 		char *sep = (options & ONEPERLINE) ? "\n" : "  ";
 
-		if ((!(options & ALL) &&
-		    ((_strcmp(path, ".") == 0) ||
-		    ((_strcmp(path, "..") == 0)))))
+		if ((!(options & ALL) &&((_strcmp(path, ".") == 0) ||((_strcmp(path, "..") == 0)))))
 		{
 			continue;
 		}
@@ -136,11 +171,18 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
 
 		if (dir == NULL)
         {
-            perror("opendir");
+            fprintf(stderr, "%s: cannot acess %s: %s\n", hls, dom->path);
             continue;
         }
 
 		dom->subentries = malloc(sizeof(dom->subentries) * BUFSIZE);
+
+		if(dom->subentries == NULL)
+		{
+			perror("malloc");
+			closedir(dir);
+			exit(EXIT_FAILURE);
+		}
 
 		read_subentries(dir, dom, &sub_count);
 
@@ -151,10 +193,10 @@ void print_files_in_directory(file_t **directory,size_t count,option_t options)
 
 		{
 
-			for (j = 0;j < sub_count; ++j)
+			for (j = 0; j < sub_count; ++j)
 				free(dom->subentries[j]);
 			free(dom->subentries);
-		}
 		closedir(dir);
+		}
 	}
 }

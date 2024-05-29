@@ -33,7 +33,6 @@ typedef struct file_t
 struct file_node_t
 {
 	char filename[256];
-
 	size_t prev;
 	size_t next;
 };

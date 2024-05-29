@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
     }
 
     if (argc < 2) {
-        printf("Usage: %s <directory>\n", argv[0]);
+        printf("Usage: %s <file or directory>...\n", argv[0]);
         free(files);
         free(directory);
         free(args);
@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
     for (j = 0; j < argc; j++) {
         args[j] = argv[j];
     }
-
+    args[argc] = NULL;
 
     separate_files(args, files, directory, &file_count, &d_count);
 
@@ -93,13 +93,16 @@ int main(int argc, char **argv) {
     printf("options = %d\n", options);
     printf("file count = %lu\n", file_count);
 
+    if (file_count > 0)
+    {
     print_files_in_current_dir(files, file_count, options);
+    }
 
     
     if (d_count > 0) {
         puts("");
-    }
     print_files_in_directory(directory, d_count, options);
+    }
 
     for (i = 0; i < file_count; ++i) {
         free(files[i]);
