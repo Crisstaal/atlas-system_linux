@@ -12,7 +12,8 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
-
+%.o: %.c shell.h
+	$(CC) $(CFLAGS) -c $< -o $@
 clean:
 	$(RM) $(OBJ)
 
