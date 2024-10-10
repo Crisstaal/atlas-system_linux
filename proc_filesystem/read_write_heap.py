@@ -5,6 +5,7 @@ Finds a string in the heap and replaces it
 
 import sys
 
+
 def read_write_heap(pid, oldstr, newstr):
     """Finds and replaces a string in the heap of a process."""
     # Ensure the new string is not longer than the old string
