@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+"""
+Finds a string in the heap and replaces it
+"""
 
 import sys
 
