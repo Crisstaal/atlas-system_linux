@@ -5,6 +5,7 @@
 #include <string.h>
 #include <gelf.h>
 #include <libelf.h>
+#include <byteswap.h>
 
 #define ELF_MAGIC_LEN 16
 
@@ -80,18 +81,35 @@ void print_header(const GElf_Ehdr *ehdr) {
             break;
     }
 
-    printf("  Machine:                           %s\n", machine_to_string(ehdr->e_machine));
-    printf("  Entry point address:               0x%lx\n", (unsigned long)ehdr->e_entry);
-    printf("  Start of program headers:          %ld (bytes into file)\n", (long)ehdr->e_phoff);
-    printf("  Start of section headers:          %ld (bytes into file)\n", (long)ehdr->e_shoff);
-    printf("  Flags:                             0x%x\n", ehdr->e_flags);
-    printf("  Size of this header:               %d (bytes)\n", ehdr->e_ehsize);
-    printf("  Size of program headers:           %d (bytes)\n", ehdr->e_phentsize);
-    printf("  Number of program headers:         %d\n", ehdr->e_phnum);
-    printf("  Size of section headers:           %d (bytes)\n", ehdr->e_shentsize);
-    printf("  Number of section headers:         %d\n", ehdr->e_shnum);
-    printf("  Section header string table index: %d\n", ehdr->e_shstrndx);
-}
+    if (ehdr->e_ident[EI_DATA] == ELFDATA2LSB) /* little endian */
+    {
+        printf("  Machine:                           %s\n", machine_to_string(ehdr->e_machine));
+        printf("  Entry point address:               0x%lx\n", (unsigned long)ehdr->e_entry);
+        printf("  Start of program headers:          %ld (bytes into file)\n", (long)ehdr->e_phoff);
+        printf("  Start of section headers:          %ld (bytes into file)\n", (long)ehdr->e_shoff);
+        printf("  Flags:                             0x%x\n", ehdr->e_flags);
+        printf("  Size of this header:               %d (bytes)\n", ehdr->e_ehsize);
+        printf("  Size of program headers:           %d (bytes)\n", ehdr->e_phentsize);
+        printf("  Number of program headers:         %d\n", ehdr->e_phnum);
+        printf("  Size of section headers:           %d (bytes)\n", ehdr->e_shentsize);
+        printf("  Number of section headers:         %d\n", ehdr->e_shnum);
+        printf("  Section header string table index: %d\n", ehdr->e_shstrndx);
+    }
+    else /* big endian, need to swap byte order multi-byte integers */
+    {
+        printf("  Machine:                           %s\n", machine_to_string(ehdr->e_machine));
+        printf("  Entry point address:               0x%lx\n", (unsigned long)bswap32(ehdr->e_entry));
+        printf("  Start of program headers:          %ld (bytes into file)\n", (long)bswap32(ehdr->e_phoff));
+        printf("  Start of section headers:          %ld (bytes into file)\n", (long)bswap32(ehdr->e_shoff));
+        printf("  Flags:                             0x%x\n", bswap32(ehdr->e_flags));
+        printf("  Size of this header:               %d (bytes)\n", bswap32(ehdr->e_ehsize));
+        printf("  Size of program headers:           %d (bytes)\n", bswap32(ehdr->e_phentsize));
+        printf("  Number of program headers:         %d\n", bswap32(ehdr->e_phnum));
+        printf("  Size of section headers:           %d (bytes)\n", bswap32(ehdr->e_shentsize));
+        printf("  Number of section headers:         %d\n", bswap32(ehdr->e_shnum));
+        printf("  Section header string table index: %d\n", bswap32(ehdr->e_shstrndx));
+    }
+
 void print_elf_header(const char *filename) {
     int fd;
     Elf *elf;
