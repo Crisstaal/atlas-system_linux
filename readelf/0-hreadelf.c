@@ -29,7 +29,6 @@ const char* osabi_to_string(unsigned char osabi) {
         case ELFOSABI_SYSV: return "UNIX - System V";
         case ELFOSABI_NETBSD: return "UNIX - NetBSD";
         case ELFOSABI_LINUX: return "UNIX - Linux";
-        // Add other OS/ABI cases as needed
         default: return "Unknown";
     }
 }
