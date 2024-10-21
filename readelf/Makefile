@@ -1,5 +1,5 @@
 # Makefile for ELF Header Reader
-CC = gcc
+CC = /usr/bin/gcc
 CFLAGS = -Wall -g
 TARGET = 0-hreadelf
 
