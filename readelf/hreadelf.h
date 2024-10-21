@@ -2,8 +2,8 @@
 #ifndef H_READ_ELF_H
 #define H_READ_ELF_H
 
-#include <libelf.h>
 #include <gelf.h>
+#include <libelf.h>
 
 
 int open_file(const char *filename);
