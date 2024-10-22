@@ -1,4 +1,3 @@
-
 #ifndef H_READ_ELF_H
 #define H_READ_ELF_H
 
