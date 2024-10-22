@@ -1,6 +1,6 @@
 # Makefile for ELF Header Reader
 CC = gcc
-CFLAGS = CFLAGS = -Wall -Werror -Wextra -pedantic
+CFLAGS = -Wall -Werror -Wextra -pedantic
 LDFLAGS = -lelf 
 TARGET = 0-hreadelf
 SRC = 0-hreadelf.c
