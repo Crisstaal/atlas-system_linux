@@ -3,11 +3,18 @@ BITS 64
 section .text
 global asm_strstr
 
+section .text
+global asm_strstr
+
 ; char *asm_strstr(const char *haystack, const char *needle);
 asm_strstr:
     ; Check if needle is NULL
     test rsi, rsi           ; Check if needle is NULL
     jz .found                ; If needle is NULL, return haystack
+
+    ; Check if needle is empty
+    cmp byte [rsi], 0       ; Check if needle is empty
+    je .found                ; If empty, return haystack
 
     ; Check if haystack is NULL
     test rdi, rdi           ; Check if haystack is NULL
