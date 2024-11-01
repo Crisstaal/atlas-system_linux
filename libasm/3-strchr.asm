@@ -13,11 +13,11 @@ asm_strchr:
 .loop:
     mov al, [rdi]      ; Load the current character from the string
     cmp al, 0          ; Check if it's the end of the string
-    je .found           ; If it's the null terminator, return it
-    
+    je .found          ; If it's the null terminator, return it
+
     cmp al, sil        ; Compare with the character we are searching for
     je .found          ; If found, jump to found
-    
+
     ; Move to the next character
     inc rdi            ; Increment pointer to the next character
     jmp .loop          ; Repeat the loop
