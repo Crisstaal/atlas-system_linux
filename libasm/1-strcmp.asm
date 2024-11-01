@@ -21,27 +21,27 @@ asm_strcmp:
     jmp     .loop            ; Repeat the loop
 
 .not_equal:
-    ; Handle empty strings
+    ; Check if one of the strings is empty
     test    al, al           ; Check if al (S1) is null
     jz      .s1_empty        ; If S1 is empty, jump to s1_empty
     test    bl, bl           ; Check if bl (S2) is null
     jz      .s2_empty        ; If S2 is empty, jump to s2_empty
 
-    ; Both strings are not empty, calculate difference
+    ; Calculate the difference and return
     movzx   eax, al          ; Zero-extend al into eax
     movzx   ebx, bl          ; Zero-extend bl into ebx
     sub     eax, ebx         ; Compute the difference in eax
     jmp     .done            ; Jump to done
 
 .s1_empty:
-    ; If S1 is empty, return a negative value (0 - bl)
+    ; If S1 is empty, return -bl (negative of bl)
     movzx   eax, bl          ; Move bl into eax
     neg     eax              ; Negate it to make it negative
     jmp     .done            ; Jump to done
 
 .s2_empty:
-    ; If S2 is empty, return a positive value (al - 0)
-    movzx   eax, al          ; Move al into eax (it's already non-zero)
+    ; If S2 is empty, return al (positive value)
+    movzx   eax, al          ; Move al into eax
     jmp     .done            ; Jump to done
 
 .equal:
