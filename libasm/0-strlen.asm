@@ -10,10 +10,11 @@ asm_strlen:
     .loop:
         mov     al, [rdi + rcx] ; Load the byte at str[rcx] into al
         test    al, al          ; Test if it's the null terminator
-        jz      .done           ; If it is, jump to done
-        inc     rcx             ; Increment counter
-        jmp     .loop           ; Repeat the loop
-
-    .done:
-        mov     rax, rcx        ; Move the counter (length) to rax
-        ret                     ; Return
+        
+        add     rcx, 1            ; Increment counter
+        cmp     al, 0              ; Compare al with 0
+        jne     .loop              ; If not zero, repeat the loop
+        
+        ; Done
+        mov     rax, rcx          ; Move the counter (length) to rax
+        ret                        ; Return

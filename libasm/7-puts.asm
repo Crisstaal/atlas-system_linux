@@ -1,26 +1,22 @@
 BITS 64
 
-extern my_strlen       ; Import my_strlen from 0-strlen.asm
 section .text
-    global asm_puts
+global asm_puts
 
 asm_puts:
-    ; Prototype: size_t asm_puts(const char *str);
+    ; Input: RDI - pointer to the string (const char *str)
+    ; The return value will be in RAX (size_t)
 
-    ; Save the string address from the first argument
-    mov     rsi, rdi         ; rsi now points to the input string
+    call my_strlen          ; Call the length function (my_strlen)
+    mov rbx, rax           ; Store the length in RBX for later use
+    
+    ; Prepare for the syscall
+    mov rax, 1        ; syscall number for sys_write
+    mov rdi, 1        ; file descriptor: stdout
+    mov rsi, RDI      ; rsi will point to the string
+    mov rdx, rBx      ; length of the string
 
-    ; Calculate the length of the string by calling my_strlen
-    call    my_strlen        ; rax will have the string length returned
+    syscall            ; Invoke syscall to write the string
 
-    ; Prepare for syscall
-    mov     rax, 1           ; syscall number for sys_write
-    mov     rdi, 1           ; file descriptor 1 is stdout
-    mov     rdx, rax         ; set the third argument for the syscall (length of string)
-
-    ; Write the string to stdout
-    mov     rsi, rdi         ; point rsi to the original string again for writing
-    syscall                  ; invoke the kernel
-
-    ; Return the number of bytes written (length of string)
-    ret                      ; rax already contains the string length
+    mov rax, rbx           ; Return value is the length of the string
+    ret                ; Return from function
