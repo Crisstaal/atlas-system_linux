@@ -1,52 +1,49 @@
 BITS 64
 
 section .text
-    global asm_strstr        ; Make the function globally accessible
+global asm_strstr
 
+; char *asm_strstr(const char *haystack, const char *needle);
 asm_strstr:
-    ; Setting up the stack frame
-    push    rbp               ; Save the base pointer
-    mov     rbp, rsp          ; Establish the stack frame
+    ; Check if needle is NULL
+    test rsi, rsi           ; Check if needle is NULL
+    jz .found                ; If needle is NULL, return haystack
 
-    mov     rdi, rdi          ; The pointer to the haystack
-    mov     rsi, rsi          ; The pointer to the needle
+    ; Check if haystack is NULL
+    test rdi, rdi           ; Check if haystack is NULL
+    jz .not_found            ; If haystack is NULL, return NULL
 
-    ; Handle the case where needle is empty
-    test    rsi, rsi          ; Check if needle is NULL
-    jz      .done             ; If needle is NULL, return haystack
+.next_char:
+    ; Save haystack pointer
+    mov rax, rdi             ; rax = haystack
 
-.loop_haystack:               ; Loop through the haystack
-    cmp     byte [rdi], 0     ; Check if end of haystack
-    je      .not_found        ; If it's null, not found
+    ; Check for the end of haystack
+    mov rcx, rsi             ; rcx = needle
+    mov rdx, rax             ; rdx = current position in haystack
 
-    ; Store current haystack position
-    mov     rdx, rdi          ; rdx holds current position in haystack
-    mov     rcx, rsi          ; rcx holds current position in needle
+.check_needle:
+    ; Compare characters
+    mov al, [rdx]           ; Load character from haystack
+    mov bl, [rcx]           ; Load character from needle
+    test al, al              ; Check if end of haystack
+    jz .not_found            ; If end of haystack, needle not found
+    cmp al, bl              ; Compare characters
+    jne .next_char_2        ; If not equal, move to the next char in haystack
 
-.loop_needle:                 ; Loop through the needle
-    cmp     byte [rcx], 0     ; Check if end of needle
-    je      .found            ; If it's null, found the substring
-
-    cmp     byte [rdx], byte [rcx] ; Compare characters
-    jne     .next_haystack    ; If not equal, go to next character in haystack
-
-    inc     rdx               ; Move to next character in haystack
-    inc     rcx               ; Move to next character in needle
-    jmp     .loop_needle      ; Repeat for next character
-
-.next_haystack:
-    inc     rdi               ; Move to next character in haystack
-    jmp     .loop_haystack    ; Check the next character in haystack
+    ; Move to the next character in needle
+    inc rcx                  ; Increment needle pointer
+    inc rdx                  ; Increment haystack pointer
+    cmp byte [rcx], 0       ; Check if end of needle
+    jne .check_needle        ; If not end of needle, continue checking
 
 .found:
-    mov     rax, rdi          ; Set return value to the address of the found substring
-    jmp     .done             ; Jump to done
+    mov rax, rdi             ; Return the original haystack pointer
+    ret
+
+.next_char_2:
+    inc rdi                  ; Move to the next character in haystack
+    jmp .next_char           ; Check again
 
 .not_found:
-    xor     rax, rax          ; Return NULL (0) if not found
-
-.done:
-    ; Teardown the stack frame
-    mov     rsp, rbp          ; Restore the stack pointer
-    pop     rbp               ; Restore the base pointer
-    ret                       ; Return from the function
+    xor rax, rax             ; Return NULL
+    ret
