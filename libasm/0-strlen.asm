@@ -1,6 +1,6 @@
 BITS 64
 
-    global asm_strlen  ; Make the function accessible to other files
+    global my_strlen  ; Make the function accessible to other files
     section .text
 asm_strlen:
     ; Prototype: size_t my_strlen(const char *str);
