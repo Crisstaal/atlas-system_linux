@@ -21,15 +21,33 @@ asm_strcmp:
     jmp     .loop            ; Repeat the loop
 
 .not_equal:
+    ; Handle empty strings
+    test    al, al           ; Check if al (S1) is null
+    jz      .s1_empty        ; If S1 is empty, jump to s1_empty
+    test    bl, bl           ; Check if bl (S2) is null
+    jz      .s2_empty        ; If S2 is empty, jump to s2_empty
+
+    ; Both strings are not empty, calculate difference
     movzx   eax, al          ; Zero-extend al into eax
     movzx   ebx, bl          ; Zero-extend bl into ebx
-    sub     eax, ebx         ; Compute the difference in eax (result in eax)
+    sub     eax, ebx         ; Compute the difference in eax
+    jmp     .done            ; Jump to done
+
+.s1_empty:
+    ; If S1 is empty, return a negative value (0 - bl)
+    movzx   eax, bl          ; Move bl into eax
+    neg     eax              ; Negate it to make it negative
+    jmp     .done            ; Jump to done
+
+.s2_empty:
+    ; If S2 is empty, return a positive value (al - 0)
+    movzx   eax, al          ; Move al into eax (it's already non-zero)
+    jmp     .done            ; Jump to done
+
+.equal:
+    xor     eax, eax         ; Set return value to 0 for equal strings
 
 .done:
     mov     rsp, rbp         ; Restore the stack pointer
     pop     rbp              ; Restore the base pointer
     ret                      ; Return from the function
-
-.equal:
-    xor     eax, eax         ; Set return value to 0 for equal strings
-    jmp     .done            ; Jump to done
