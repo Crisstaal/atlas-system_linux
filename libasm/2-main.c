@@ -16,9 +16,9 @@
  */
 int main(void)
 {
-    assert(strcmp(S1, S1) == asm_strcmp(S1, S1));
-    assert(strcmp(S1, S2) == asm_strcmp(S1, S2));
-    assert(strcmp(S1, S3) == asm_strcmp(S1, S3));
+    assert(strncmp(S1, S3, 1) == asm_strncmp(S1, S3, 1));
+    assert(strncmp(S1, S3, 11) == asm_strncmp(S1, S3, 11));
+    assert(strncmp(S1, S3, 15) == asm_strncmp(S1, S3, 15));
 
     printf("All good!\n");
     return (EXIT_SUCCESS);
