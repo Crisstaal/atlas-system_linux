@@ -1,31 +1,30 @@
 BITS 64
 
 section .text
-global asm_strchr        ; Make the function globally accessible
+global asm_strchr
 
 asm_strchr:
-    ; Input: rdi = pointer to string (const char *s), rsi = character (int c)
+    ; Arguments:
+    ; rdi = const char *s1
+    ; rsi = int c
 
-    ; Check if the string is NULL
-    test rdi, rdi
-    jz .not_found       ; If NULL, go to not_found
+    xor rax, rax                ; Clear rax (used for pointer return)
+    test rdi, rdi               ; Check if s1 is NULL
+    jz .found_null               ; If s1 is NULL, return NULL
 
 .loop:
-    mov al, [rdi]      ; Load the current character from the string
-    cmp al, 0          ; Check if it's the end of the string
-    je .found          ; If it's the null terminator, return it
-
-    cmp al, sil        ; Compare with the character we are searching for
-    je .found          ; If found, jump to found
-
-    ; Move to the next character
-    inc rdi            ; Increment pointer to the next character
-    jmp .loop          ; Repeat the loop
+    mov al, byte [rdi]          ; Load byte from s1
+    cmp al, sil                 ; Compare with character c
+    je .found                   ; If equal, jump to found
+    test al, al                 ; Check for null terminator
+    jz .found_null              ; If we reach the end, return NULL
+    inc rdi                     ; Move to the next character
+    jmp .loop                   ; Repeat
 
 .found:
-    mov rax, rdi       ; Return the pointer to the found character
+    mov rax, rdi                ; Set rax to the address of the found character
     ret
 
-.not_found:
-    xor rax, rax       ; Return NULL (0) if not found
+.found_null:
+    xor rax, rax                ; Return NULL
     ret
