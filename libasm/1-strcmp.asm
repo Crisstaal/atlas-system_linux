@@ -1,14 +1,13 @@
 BITS 64
 
-    global asm_strcmp        ; Make the function globally accessible
-    section .text
+global asm_strcmp            ; Make the function globally accessible
+section .text
 
 asm_strcmp:
     ; Setting up the stack frame
     push    rbp              ; Save the base pointer
     mov     rbp, rsp         ; Establish the stack frame
 
-    ; Loop through both strings
 .loop:
     mov     al, [rdi]        ; Load the next byte of s1 into al
     mov     bl, [rsi]        ; Load the next byte of s2 into bl
@@ -22,18 +21,15 @@ asm_strcmp:
     jmp     .loop            ; Repeat the loop
 
 .not_equal:
-    ; Zero-extend al and bl to 32-bit registers for safe subtraction
-    movzx   eax, al          ; Move al into eax, zero-extending it
-    movzx   ebx, bl          ; Move bl into ebx, zero-extending it
-    sub     eax, ebx         ; Compute the difference in eax
-    movsx   rax, eax         ; Sign-extend eax into rax for the return value
-    jmp     .done            ; Jump to done
-    
-.equal:
-    xor     rax, rax         ; Set return value to 0 for equal strings
+    movzx   eax, al          ; Zero-extend al into eax
+    movzx   ebx, bl          ; Zero-extend bl into ebx
+    sub     eax, ebx         ; Compute the difference in eax (result in eax)
 
 .done:
-    ; Teardown the stack frame
     mov     rsp, rbp         ; Restore the stack pointer
     pop     rbp              ; Restore the base pointer
     ret                      ; Return from the function
+
+.equal:
+    xor     eax, eax         ; Set return value to 0 for equal strings
+    jmp     .done            ; Jump to done
