@@ -1,7 +1,7 @@
 BITS 64
 
-section .text
     global asm_strcmp        ; Make the function globally accessible
+    section .text
 
 asm_strcmp:
     ; Setting up the stack frame
@@ -22,9 +22,8 @@ asm_strcmp:
     jmp     .loop            ; Repeat the loop
 
 .not_equal:
-    sub     rax, rax         ; Clear rax
-    mov     rax, al          ; Move the value of al (character from s1) into rax
-    sub     rax, bl          ; Subtract the character from s2
+    movzx   rax, al          ; Zero-extend the value of al into rax
+    sub     rax, bl          ; Subtract the character from s2 from rax
     jmp     .done            ; Jump to done
 
 .equal:
