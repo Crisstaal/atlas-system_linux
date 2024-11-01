@@ -27,7 +27,7 @@ asm_strstr:
     cmp     byte [rcx], 0     ; Check if end of needle
     je      .found            ; If it's null, found the substring
 
-    cmp     byte [rdx], [rcx]  ; Compare characters
+    cmp     byte [rdx], byte [rcx] ; Compare characters
     jne     .next_haystack    ; If not equal, go to next character in haystack
 
     inc     rdx               ; Move to next character in haystack
