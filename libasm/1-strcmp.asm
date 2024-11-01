@@ -22,9 +22,12 @@ asm_strcmp:
     jmp     .loop            ; Repeat the loop
 
 .not_equal:
-    sub     al, bl          ; Subtract the character from s2 from s1
-    movsx   rax, al         ; Sign-extend al into rax to set return value
-    jmp     .done           ; Jump to done
+    ; Zero-extend al and bl to 32-bit registers for safe subtraction
+    movzx   eax, al          ; Move al into eax, zero-extending it
+    movzx   ebx, bl          ; Move bl into ebx, zero-extending it
+    sub     eax, ebx         ; Compute the difference in eax
+    movsx   rax, eax         ; Sign-extend eax into rax for the return value
+    jmp     .done            ; Jump to done
     
 .equal:
     xor     rax, rax         ; Set return value to 0 for equal strings
