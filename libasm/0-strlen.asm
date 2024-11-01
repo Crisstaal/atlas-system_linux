@@ -4,9 +4,9 @@ BITS 64
     section .text
 asm_strlen:
     ; Prototype: size_t my_strlen(const char *str);
-    
+
     xor     rcx, rcx          ; Zero out rcx (this will be our counter)
-    
+
     .loop:
         mov     al, [rdi + rcx] ; Load the byte at str[rcx] into al
         test    al, al          ; Test if it's the null terminator
