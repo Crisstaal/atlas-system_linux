@@ -5,7 +5,7 @@ BITS 64
 my_strlen:
     ; Prototype: size_t my_strlen(const char *str);
 
-    xor     rcx, rcx          ; Zero out rcx (this will be our counter)
+    xor     rcx, rcx          ; Zero out rcx
 
     .loop:
         mov     al, [rdi + rcx] ; Load the byte at str[rcx] into al

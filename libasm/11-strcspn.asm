@@ -7,7 +7,7 @@ section .text
     global asm_strcspn    ; Make the function globally accessible
 
 asm_strcspn:  ; Label for the function
-    ; Setting up the stack frame (always do this!)
+    ; Setting up the stack frame
     push    rbp                 ; Preserve base pointer on the stack
     mov     rbp, rsp            ; Set the base pointer to the current stack pointer
 
@@ -26,11 +26,11 @@ asm_strcspn:  ; Label for the function
     test    al, al               ; Check if character was found in reject
     jnz     .done                ; If found, we're done
 
-    inc     rax                  ; Increment the count (valid character)
+    inc     rax                  ; Increment the count 
     jmp     .s_loop              ; Repeat the loop
 
 .done:
-    ; Tearing down the stack frame (always do this!)
+    ; Tearing down the stack frame
     mov     rsp, rbp            ; Restore previous stack pointer
     pop     rbp                 ; Restore previous base pointer
     ret                         ; Return from the function

@@ -7,11 +7,11 @@ section .text
     global asm_strpbrk    ; Make the function globally accessible
 
 asm_strpbrk:  ; Label for the function
-    ; Setting up the stack frame (always do this!)
+    ; Setting up the stack frame
     push    rbp                 ; Preserve base pointer on the stack
     mov     rbp, rsp            ; Set the base pointer to the current stack pointer
 
-    xor     rax, rax            ; Initialize counter for s (i = 0)
+    xor     rax, rax            ; Initialize counter for s
 
 .s_loop:
     mov     al, byte [rdi + rax] ; Load character from s
@@ -31,6 +31,10 @@ asm_strpbrk:  ; Label for the function
 
     inc     rcx                  ; Move to the next character in accept
     jmp     .accept_loop         ; Repeat the check
+
+.found:
+    lea     rax, [rdi + rax]     ; Load address of found character into rax
+    jmp     .done                ; Go to done
 
 .not_found:
     inc     rax                  ; Increment s counter

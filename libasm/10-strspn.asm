@@ -7,7 +7,7 @@ section .text
     global asm_strspn    ; Make the function globally accessible
 
 asm_strspn:  ; Label for the function
-    ; Setting up the stack frame (always do this!)
+    ; Setting up the stack frame
     push    rbp                 ; Preserve base pointer on the stack
     mov     rbp, rsp            ; Set the base pointer to the current stack pointer
 
@@ -33,7 +33,7 @@ asm_strspn:  ; Label for the function
     jmp     .s_loop
 
 .done:
-    ; Tearing down the stack frame (always do this!)
+    ; Tearing down the stack frame
     mov     rsp, rbp            ; Restore previous stack pointer
     pop     rbp                 ; Restore previous base pointer
     ret                         ; Return from the function
