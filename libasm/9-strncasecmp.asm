@@ -6,7 +6,7 @@ section .text
 asm_strncasecmp:
     ; Prototype: int asm_strncasecmp(const char *s1, const char *s2, size_t n);
     
-    xor     rax, rax           ; Clear rax (this will hold the return value)
+    xor     rax, rax           ; Clear rax
 
 .loop:
     test    rdx, rdx           ; Check if n is zero

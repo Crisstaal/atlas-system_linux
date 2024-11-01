@@ -41,7 +41,6 @@ asm_strpbrk:  ; Label for the function
     jmp     .s_loop              ; Repeat the loop
 
 .done:
-    ; Tearing down the stack frame (always do this!)
     mov     rsp, rbp            ; Restore previous stack pointer
     pop     rbp                 ; Restore previous base pointer
     ret                         ; Return from the function

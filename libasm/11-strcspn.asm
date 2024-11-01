@@ -11,7 +11,7 @@ asm_strcspn:  ; Label for the function
 
 .s_loop:
     mov     al, byte [rdi + rax] ; Load character from s
-    test    al, al               ; Check if null (end of string)
+    test    al, al               ; Check if null
     jz      .done                ; If null, we're done
 
     ; Check if the character is in the reject string
