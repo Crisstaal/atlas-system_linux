@@ -5,8 +5,6 @@
 
 #include "signals.h"
 
-static int sigint_count = 0;
-
 /**
  * signal_handler - Prints message when SIGINT is caught
  * @signum: The signal number
