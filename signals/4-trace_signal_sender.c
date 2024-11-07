@@ -18,7 +18,7 @@ void sigquit_handler(int signum, siginfo_t *info, void *context)
 }
 
 /**
- * trace_signal_sender - Sets a handler for SIGQUIT that traces the sender's PID
+ * trace_signal_sender - Sets a handler for SIGQUIT
  *
  * Return: 0 on success, -1 on error
  */
@@ -34,8 +34,8 @@ int trace_signal_sender(void)
     /* Set the handler for SIGQUIT */
     if (sigaction(SIGQUIT, &sa, NULL) == -1)
     {
-        return -1;
+        return (-1);
     }
 
-    return 0;
+    return (0);
 }

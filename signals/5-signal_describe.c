@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     }
 
     int signum = atoi(argv[1]);
-    const char *description = strsignal(signum);
+    const char *description = ssignal(signum);
 
     if (description)
         printf("%d: %s\n", signum, description);

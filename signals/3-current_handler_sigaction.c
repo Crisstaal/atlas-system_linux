@@ -13,9 +13,9 @@ void (*current_handler_sigaction(void))(int)
     /* Retrieve the current action for SIGINT */
     if (sigaction(SIGINT, NULL, &sa) == -1)
     {
-        return NULL;
+        return (NULL);
     }
 
     /* Return the current handler for SIGINT */
-    return sa.sa_handler;
+    return (sa.sa_handler);
 }
