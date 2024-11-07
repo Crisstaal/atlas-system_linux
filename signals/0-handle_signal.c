@@ -1,5 +1,9 @@
-#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
+#include <signal.h>
+
+#include "signals.h"
 
 /**
  * signal_handler - Prints message when SIGINT is caught
