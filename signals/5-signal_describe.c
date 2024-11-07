@@ -16,14 +16,6 @@ int main(int argc, char *argv[])
         printf("Usage: %s <signum>\n", argv[0]);
         return (EXIT_FAILURE);
     }
-
-    int signum = atoi(argv[1]);
-    const char *description = ssignal(signum);
-
-    if (description)
-        printf("%d: %s\n", signum, description);
-    else
-        printf("%d: Unknown signal %d\n", signum, signum);
-
+    printf("%d: %s\n", atoi(argv[1]), strsignal(atoi(argv[1])));
     return (EXIT_SUCCESS);
 }
