@@ -11,7 +11,6 @@ void sigint_handler(int signum)
 {
     printf("Caught %d\n", signum);
     printf("Signal received\n");
-    _exit(EXIT_SUCCESS);  /* Use _exit to terminate the program */
 }
 
 /**
