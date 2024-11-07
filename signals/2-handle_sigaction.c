@@ -8,6 +8,7 @@
 void sigint_handler(int signum)
 {
     printf("Gotcha! [%d]\n", signum);
+    fflush(stdout);
 }
 
 /**
@@ -19,15 +20,10 @@ int handle_sigaction(void)
 {
     struct sigaction sa;
 
-    /* Set up the structure to specify the new action */
+    /* Set up the structure*/
     sa.sa_handler = sigint_handler;
-    sa.sa_flags = 0;
-    sigemptyset(&sa.sa_mask);
+    
 
-    /* Set the SIGINT handler */
-    if (sigaction(SIGINT, &sa, NULL) == -1)
-    {
-        return -1;
-    }
-    return 0;
+    
+    return (sigaction(SIGINT, &sa, NULL))
 }
