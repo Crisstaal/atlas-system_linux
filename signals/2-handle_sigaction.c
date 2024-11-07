@@ -22,8 +22,6 @@ int handle_sigaction(void)
 
     /* Set up the structure*/
     sa.sa_handler = sigint_handler;
-    
 
-    
-    return (sigaction(SIGINT, &sa, NULL))
+    return (sigaction(SIGINT, &sa, NULL));
 }
