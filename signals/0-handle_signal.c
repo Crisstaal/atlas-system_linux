@@ -15,15 +15,6 @@ void signal_handler(int signum)
 {
     printf("Gotcha! [%d]\n", signum);
     fflush(stdout);
-
-     sigint_count++;
-
-    /* After the third signal, print the "Quit" message and terminate the program*/
-    if (sigint_count == 3)
-    {
-        printf("Quit (core dumped)\n");
-        exit(0);  
-    }
 }
 
 /**
@@ -34,8 +25,7 @@ void signal_handler(int signum)
 int handle_signal(void)
 {
     if (signal(SIGINT, signal_handler) == SIG_ERR)
-    {
-        return -1;
-    }
-    return 0;
+    
+        return (-1);
+    return (0);
 }
