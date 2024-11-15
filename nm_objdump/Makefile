@@ -1,5 +1,7 @@
 CC := gcc
 CFLAGS := -Wall -Werror -Wextra -pedantic
+LDFLAGS := -lelf
+
 TARGET := hnm
 SRC_FILES := $(wildcard *.c)
 OBJ_FILES := $(SRC_FILES:.c=.o)
@@ -8,11 +10,11 @@ OBJ_FILES := $(SRC_FILES:.c=.o)
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ)
+$(TARGET): $(OBJ_FILES)
 	@$(CC) $(CFLAGS) -o $@ $^
 
-%.o: %.c hnm.h
-	$(CC) $(CFLAGS) -c -o $@ $^
+%.o: %.c
+	@$(CC) $(CFLAGS) -c -o $@ $^
 
 clean:
 	@rm -f *.o $(TARGET)
