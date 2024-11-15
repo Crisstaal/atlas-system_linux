@@ -1,5 +1,5 @@
-CC = gcc
-CFLAGS = -Wall -Werror -Wextra -pedantic
+CC := gcc
+CFLAGS := -Wall -Werror -Wextra -pedantic
 TARGET := hnm
 SRC_FILES := $(wildcard *.c)
 OBJ_FILES := $(SRC_FILES:.c=.o)
