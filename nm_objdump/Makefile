@@ -11,7 +11,7 @@ OBJ_FILES := $(SRC_FILES:.c=.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJ_FILES)
-	@$(CC) $(CFLAGS) -o $@ $^
+	@$(CC) $(CFLAGS) -o $@ $^ -lelf
 
 %.o: %.c
 	@$(CC) $(CFLAGS) -c -o $@ $^
