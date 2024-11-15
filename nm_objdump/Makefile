@@ -1,13 +1,18 @@
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra -pedantic
-LDFLAGS = -lelf 
-TARGET = hnm
-SRC = hnm.c
+TARGET := hnm
+SRC_FILES := $(wildcard *.c)
+OBJ_FILES := $(SRC_FILES:.c=.o)
+
+.PHONY := all clean
 
 all: $(TARGET)
 
-$(TARGET): $(SRC)
-	$(CC) $(CFLAGS) -o $(TARGET) $(SRC) $(LDFLAGS)
+$(TARGET): $(OBJ)
+	@$(CC) $(CFLAGS) -o $@ $^
+
+%.o: %.c hnm.h
+	$(CC) $(CFLAGS) -c -o $@ $^
 
 clean:
-	rm -f $(TARGET)
+	@rm -f *.o $(TARGET)
