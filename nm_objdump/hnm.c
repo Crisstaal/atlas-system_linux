@@ -25,24 +25,73 @@ static size_t num_symbols = 0;
  */
 int main(int argc, char **argv)
 {
-	int i = 1;
+    int i = 1;
+    Elf *elf;
+    int fd;
+    GElf_Ehdr ehdr;
 
-	if (argc < 2)
-	{
-		fprintf(stderr, "Usage: %s <elf_file>...\n", argv[0]);
-		return (EXIT_FAILURE);
-	}
+    if (argc < 2)
+    {
+        fprintf(stderr, "Usage: %s <elf_file>...\n", argv[0]);
+        return (EXIT_FAILURE);
+    }
 
-	if (elf_version(EV_CURRENT) == EV_NONE)
-	{
-		fprintf(stderr, "ELF library initialization failed.\n");
-		return (EXIT_FAILURE);
-	}
+    if (elf_version(EV_CURRENT) == EV_NONE)
+    {
+        fprintf(stderr, "ELF library initialization failed.\n");
+        return (EXIT_FAILURE);
+    }
 
-	for (i= 1; i < argc; i++)
-		handle_elf_file(argv[i]);
+    for (i = 1; i < argc; i++)
+    {
+        fd = open(argv[i], O_RDONLY);
+        if (fd < 0)
+        {
+            perror(argv[i]);
+            continue;
+        }
 
-	return (EXIT_SUCCESS);
+        elf = elf_begin(fd, ELF_C_READ, NULL);
+        if (!elf || elf_kind(elf) != ELF_K_ELF)
+        {
+            fprintf(stderr, "%s: Not a valid ELF file.\n", argv[i]);
+            close(fd);
+            continue;
+        }
+
+        /*Retrieve the ELF header*/
+        if (gelf_getehdr(elf, &ehdr) != &ehdr)
+        {
+            fprintf(stderr, "Failed to get ELF header for %s\n", argv[i]);
+            elf_end(elf);
+            close(fd);
+            continue;
+        }
+
+        /*Check if the ELF file is 32-bit or 64-bit*/
+        if (ehdr.e_ident[EI_CLASS] == ELFCLASS64)
+        {
+            /*Handle 64-bit ELF files*/
+            printf("64-bit ELF file detected: %s\n", argv[i]);
+            handle_elf_file(argv[i], elf);
+        }
+        else if (ehdr.e_ident[EI_CLASS] == ELFCLASS32)
+        {
+            /*Handle 32-bit ELF files*/
+            printf("32-bit ELF file detected: %s\n", argv[i]);
+            handle_elf_file(argv[i], elf);
+        }
+        else
+        {
+            fprintf(stderr, "%s: Unsupported ELF class\n", argv[i]);
+        }
+
+        /*Cleanup after processing each ELF file*/
+        elf_end(elf);
+        close(fd);
+    }
+
+    return (EXIT_SUCCESS);
 }
 
 /**
