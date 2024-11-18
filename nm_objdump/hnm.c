@@ -6,7 +6,6 @@
 #include <string.h>
 #include "hnm.h"
 
-void check_dependencies(void);
 
 typedef struct symbol_entry {
     char *name;
@@ -39,14 +38,6 @@ int main(int argc, char **argv)
         fprintf(stderr, "ELF library initialization failed.\n");
         return (EXIT_FAILURE);
     }
-    
-    void check_dependencies(void)
-    {
-    if (system("ldd ./hnm | grep libc.so.6") != 0)
-    {
-        fprintf(stderr, "./hnm: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by ./hnm)\n");
-        exit(EXIT_FAILURE);
-    }
 
     for (i = 1; i < argc; i++)
     {
@@ -54,7 +45,6 @@ int main(int argc, char **argv)
     }
 
     return (EXIT_SUCCESS);
-    }
 }
         
 /**
