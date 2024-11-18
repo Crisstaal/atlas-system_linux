@@ -38,6 +38,8 @@ int main(int argc, char **argv)
         fprintf(stderr, "ELF library initialization failed.\n");
         return (EXIT_FAILURE);
     }
+    
+    check_dependencies();
 
     for (i = 1; i < argc; i++)
     {
