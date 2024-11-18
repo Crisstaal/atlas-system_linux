@@ -25,10 +25,7 @@ static size_t num_symbols = 0;
  */
 int main(int argc, char **argv)
 {
-    int i = 1;
-    Elf *elf;
-    int fd;
-    GElf_Ehdr ehdr;
+    int i;
 
     if (argc < 2)
     {
@@ -44,56 +41,12 @@ int main(int argc, char **argv)
 
     for (i = 1; i < argc; i++)
     {
-        fd = open(argv[i], O_RDONLY);
-        if (fd < 0)
-        {
-            perror(argv[i]);
-            continue;
-        }
-
-        elf = elf_begin(fd, ELF_C_READ, NULL);
-        if (!elf || elf_kind(elf) != ELF_K_ELF)
-        {
-            fprintf(stderr, "%s: Not a valid ELF file.\n", argv[i]);
-            close(fd);
-            continue;
-        }
-
-        /*Retrieve the ELF header*/
-        if (gelf_getehdr(elf, &ehdr) != &ehdr)
-        {
-            fprintf(stderr, "Failed to get ELF header for %s\n", argv[i]);
-            elf_end(elf);
-            close(fd);
-            continue;
-        }
-
-        /*Check if the ELF file is 32-bit or 64-bit*/
-        if (ehdr.e_ident[EI_CLASS] == ELFCLASS64)
-        {
-            /*Handle 64-bit ELF files*/
-            printf("64-bit ELF file detected: %s\n", argv[i]);
-            handle_elf_file(argv[i], elf);
-        }
-        else if (ehdr.e_ident[EI_CLASS] == ELFCLASS32)
-        {
-            /*Handle 32-bit ELF files*/
-            printf("32-bit ELF file detected: %s\n", argv[i]);
-            handle_elf_file(argv[i], elf);
-        }
-        else
-        {
-            fprintf(stderr, "%s: Unsupported ELF class\n", argv[i]);
-        }
-
-        /*Cleanup after processing each ELF file*/
-        elf_end(elf);
-        close(fd);
+         handle_elf_file(argv[i]);
     }
 
     return (EXIT_SUCCESS);
 }
-
+        
 /**
  * handle_elf_file - Processes a single ELF file
  * @file_path: Path to the ELF file
@@ -121,6 +74,7 @@ void handle_elf_file(const char *file_path)
 	}
 
 	display_symbols(elf);
+
 	elf_end(elf);
 	close(fd);
 }
