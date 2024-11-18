@@ -6,6 +6,7 @@
 #include <string.h>
 #include "hnm.h"
 
+void check_dependencies(void);
 
 typedef struct symbol_entry {
     char *name;
