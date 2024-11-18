@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <libelf.h>
 #include <gelf.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -40,7 +39,7 @@ int main(int argc, char **argv)
 		return (EXIT_FAILURE);
 	}
 
-	for (i < argc; i++)
+	for (i= 1; i < argc; i++)
 		handle_elf_file(argv[i]);
 
 	return (EXIT_SUCCESS);
@@ -88,7 +87,7 @@ void display_symbols(Elf *elf)
 	Elf_Data *data;
 	GElf_Sym symbol;
 	size_t section_str_index;
-	size_t i = 0;
+	size_t i;
 
 	if (elf_getshdrstrndx(elf, &section_str_index) != 0)
 	{
@@ -105,7 +104,7 @@ void display_symbols(Elf *elf)
 			continue;
 
 		data = elf_getdata(section, NULL);
-		for (i < section_header.sh_size / section_header.sh_entsize; i++)
+		for (i = 0; i < section_header.sh_size / section_header.sh_entsize; i++)
 		{
 			if (gelf_getsym(data, i, &symbol) != &symbol)
 				continue;
