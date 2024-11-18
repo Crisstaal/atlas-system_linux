@@ -40,7 +40,13 @@ int main(int argc, char **argv)
         return (EXIT_FAILURE);
     }
     
-    check_dependencies();
+    void check_dependencies(void)
+    {
+    if (system("ldd ./hnm | grep libc.so.6") != 0)
+    {
+        fprintf(stderr, "./hnm: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by ./hnm)\n");
+        exit(EXIT_FAILURE);
+    }
 
     for (i = 1; i < argc; i++)
     {
@@ -48,6 +54,7 @@ int main(int argc, char **argv)
     }
 
     return (EXIT_SUCCESS);
+    }
 }
         
 /**
