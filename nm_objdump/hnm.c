@@ -4,7 +4,18 @@
 #include <gelf.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
 #include "hnm.h"
+
+
+typedef struct symbol_entry {
+    char *name;
+    Elf64_Addr addr;
+    char type;
+} symbol_entry;
+
+static symbol_entry *symbols = NULL;
+static size_t num_symbols = 0;
 
 /**
  * main - Entry point for the hnm program
@@ -15,7 +26,7 @@
  */
 int main(int argc, char **argv)
 {
-	int i;
+	int i = 1;
 
 	if (argc < 2)
 	{
@@ -29,7 +40,7 @@ int main(int argc, char **argv)
 		return (EXIT_FAILURE);
 	}
 
-	for (i = 1; i < argc; i++)
+	for (i < argc; i++)
 		handle_elf_file(argv[i]);
 
 	return (EXIT_SUCCESS);
@@ -55,7 +66,8 @@ void handle_elf_file(const char *file_path)
 	if (!elf || elf_kind(elf) != ELF_K_ELF)
 	{
 		fprintf(stderr, "%s: Not a valid ELF file.\n", file_path);
-		if (elf) elf_end(elf);
+		if (elf)
+			elf_end(elf);
 		close(fd);
 		return;
 	}
@@ -75,8 +87,8 @@ void display_symbols(Elf *elf)
 	GElf_Shdr section_header;
 	Elf_Data *data;
 	GElf_Sym symbol;
-	size_t section_str_index, i;
-	char *name, type;
+	size_t section_str_index;
+	size_t i = 0;
 
 	if (elf_getshdrstrndx(elf, &section_str_index) != 0)
 	{
@@ -93,27 +105,42 @@ void display_symbols(Elf *elf)
 			continue;
 
 		data = elf_getdata(section, NULL);
-		for (i = 0; i < section_header.sh_size / section_header.sh_entsize; i++)
+		for (i < section_header.sh_size / section_header.sh_entsize; i++)
 		{
 			if (gelf_getsym(data, i, &symbol) != &symbol)
 				continue;
 
-			name = elf_strptr(elf, section_header.sh_link, symbol.st_name);
+			char *name = elf_strptr(elf, section_header.sh_link, symbol.st_name);
 			if (!name)
-			{
-				fprintf(stderr, "Error: Failed to get symbol name.\n");
-				continue;
-			}
-			
-			if (*name == '\0')
-				continue;
+			name = "";
 
-			type = determine_symbol_type(&symbol, &section_header);
-			fprintf(stderr, "Symbol: %s, Addr: %lx, Type: %c\n", name, symbol.st_value, type);
-			output_symbol(name, symbol.st_value, type);
-		}
-	}
+            char type = determine_symbol_type(&symbol, &section_header);
+
+            /* Store symbol in list */
+            symbols = realloc(symbols, sizeof(symbol_entry) * (num_symbols + 1));
+            if (!symbols) {
+                fprintf(stderr, "Memory allocation error.\n");
+                return;
+            }
+            symbols[num_symbols].name = strdup(name);
+            symbols[num_symbols].addr = symbol.st_value;
+            symbols[num_symbols].type = type;
+            num_symbols++;
+        }
+    }
+
+    /* Sort and display symbols */
+    qsort(symbols, num_symbols, sizeof(symbol_entry), compare_symbols);
+    for (i = 0; i < num_symbols; i++) {
+        output_symbol(symbols[i].name, symbols[i].addr, symbols[i].type);
+        free(symbols[i].name); /* Free allocated name */
+    }
+    free(symbols);
+    symbols = NULL;
+    num_symbols = 0;
 }
+
+			
 
 /**
  * determine_symbol_type - Determines the type of a symbol
@@ -124,24 +151,46 @@ void display_symbols(Elf *elf)
  */
 char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr)
 {
-	if (GELF_ST_BIND(sym->st_info) == STB_WEAK)
-		return (GELF_ST_TYPE(sym->st_info) == STT_OBJECT ? 'V' : 'W');
-	if (GELF_ST_BIND(sym->st_info) == STB_GLOBAL && sym->st_shndx == SHN_UNDEF)
-		return ('U');
-	if (sym->st_shndx == SHN_ABS)
-		return ('A');
-	if (sym->st_shndx == SHN_COMMON)
-		return ('C');
-	if (shdr->sh_type == SHT_NOBITS && shdr->sh_flags == (SHF_ALLOC | SHF_WRITE))
-		return ('B');
-	if (shdr->sh_type == SHT_PROGBITS && shdr->sh_flags == SHF_ALLOC)
-		return ('R');
-	if (shdr->sh_type == SHT_PROGBITS && shdr->sh_flags == (SHF_ALLOC | SHF_WRITE))
-		return ('D');
-	if (shdr->sh_type == SHT_PROGBITS && shdr->sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
-		return ('T');
-	return ('?');
+	 if (GELF_ST_BIND(sym->st_info) == STB_WEAK) {
+        if (GELF_ST_TYPE(sym->st_info) == STT_OBJECT)
+            return 'V';
+        return 'W';
+    }
+    if (sym->st_shndx == SHN_UNDEF)
+        return 'U';
+    if (sym->st_shndx == SHN_ABS)
+        return 'A';
+    if (sym->st_shndx == SHN_COMMON)
+        return 'C';
+    if (shdr->sh_type == SHT_NOBITS && (shdr->sh_flags & SHF_ALLOC))
+        return 'B';
+    if (shdr->sh_type == SHT_PROGBITS && (shdr->sh_flags & SHF_ALLOC)) {
+        if (shdr->sh_flags & SHF_EXECINSTR)
+            return 'T';
+        return 'R';
+    }
+    return '?';
 }
+
+/**
+ * compare_symbols - Comparison function for sorting symbols
+ * @a: First symbol entry
+ * @b: Second symbol entry
+ *
+ * Return: Negative, zero, or positive based on comparison
+ */
+int compare_symbols(const void *a, const void *b)
+{
+    const symbol_entry *sym_a = (const symbol_entry *)a;
+    const symbol_entry *sym_b = (const symbol_entry *)b;
+
+    if (sym_a->addr < sym_b->addr)
+        return -1;
+    if (sym_a->addr > sym_b->addr)
+        return 1;
+    return 0;
+}
+
 
 /**
  * output_symbol - Prints a symbol's details in the required format
@@ -151,8 +200,8 @@ char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr)
  */
 void output_symbol(const char *name, Elf64_Addr addr, char type)
 {
-	if (type == 'U' || type == 'w')
-		printf("         %c %s\n", type, name);
-	else
-		printf("%018lx %c %s\n", (unsigned long)addr, type);
+    if (type == 'U' || type == 'w')
+        printf("                 %c %s\n", type, name);
+    else
+        printf("%08lx %c %s\n", (unsigned long)addr, type, name);
 }
