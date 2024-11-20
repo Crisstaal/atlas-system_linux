@@ -172,7 +172,7 @@ char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr) {
 void output_symbol(const char *name, Elf64_Addr addr, char type)
 {
     if (type == 'U' || type == 'w')
-        printf("                 %c %s\n", type, name);
+    printf("                 %c %s\n", type, name);
     else
         printf("%016lx %c %s\n", addr, type, name);
 }
