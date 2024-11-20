@@ -127,26 +127,41 @@ void display_symbols(Elf *elf)
  *
  * Return: Character representing the symbol type
  */
-char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr)
-{
-    if (GELF_ST_BIND(sym->st_info) == STB_WEAK)
+char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr) {
+    if (GELF_ST_BIND(sym->st_info) == STB_WEAK) {
         return (GELF_ST_TYPE(sym->st_info) == STT_OBJECT) ? 'V' : 'W';
-    if (sym->st_shndx == SHN_UNDEF)
-        return 'U';
-    if (sym->st_shndx == SHN_ABS)
-        return 'A';
-    if (sym->st_shndx == SHN_COMMON)
-        return 'C';
-    if (shdr->sh_type == SHT_PROGBITS && (shdr->sh_flags & SHF_EXECINSTR))
-        return 'T';
-    if (shdr->sh_flags & SHF_ALLOC && shdr->sh_flags & SHF_WRITE)
-        return 'D';
-    if (shdr->sh_flags & SHF_ALLOC)
-        return 'R';
-    if (shdr->sh_type == SHT_NOBITS && shdr->sh_flags & SHF_ALLOC)
-        return 'B';
-    return '?'; 
+    }
+    if (sym->st_shndx == SHN_UNDEF) {
+        return ('U');
+    }
+    if (sym->st_shndx == SHN_ABS) {
+        return ('A');
+    }
+    if (sym->st_shndx == SHN_COMMON) {
+        return ('C');
+    }
+    if (shdr == NULL) {
+        return ('?');
+    }
+
+    if (shdr->sh_type == SHT_PROGBITS && (shdr->sh_flags & SHF_EXECINSTR)) {
+        return ('T');
+    }
+
+    if (shdr->sh_flags & SHF_WRITE) {
+        if (shdr->sh_type == SHT_NOBITS) {
+            return ('B');
+        }
+        return ('D');
+    }
+
+    if (shdr->sh_flags & SHF_ALLOC) {
+        return ('R');
+    }
+
+    return ('?');
 }
+
 
 /**
  * output_symbol - Prints a symbol's details in the required format
