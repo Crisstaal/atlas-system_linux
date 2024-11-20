@@ -79,7 +79,6 @@ void display_symbols(Elf *elf)
 	Elf_Scn *section = NULL;
 	GElf_Shdr section_header;
 	Elf_Data *data;
-	GElf_Sym symbol;
 	size_t section_str_index;
 	size_t i;
 
