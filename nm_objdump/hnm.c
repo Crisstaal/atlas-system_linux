@@ -102,6 +102,7 @@ void display_symbols(Elf *elf)
 		data = elf_getdata(section, NULL);
 		for (i = 0; i < section_header.sh_size / section_header.sh_entsize; i++)
 		{
+            GElf_Sym symbol;
 			if (gelf_getsym(data, i, &symbol) != &symbol)
 				continue;
 
@@ -175,12 +176,12 @@ void output_symbol(const char *name, Elf64_Addr addr, char type)
     if (type == 'U' || type == 'w')
         printf("                 %c %s\n", type, name);
     else if (type == 'A') {
-        printf("%016lx %c %s\n", (unsigned long long)addr, type, name);
+        printf("%016llx %c %s\n", (unsigned long long)addr, type, name);
     } else if (type == 'B') {
-        printf("%016lx %c %s\n", (unsigned long long)addr, type, name);
+        printf("%016llx %c %s\n", (unsigned long long)addr, type, name);
     } else if (type == 'T' || type == 't') {
-        printf("%016lx %c %s\n", (unsigned long long)addr, type, name);
+        printf("%016llx %c %s\n", (unsigned long long)addr, type, name);
     } else {
-        printf("%016lx %c %s\n", (unsigned long long)addr, type, name);
+        printf("%016llx %c %s\n", (unsigned long long)addr, type, name);
     }
 }
