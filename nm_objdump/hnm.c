@@ -16,10 +16,6 @@
 int main(int argc, char **argv)
 {
     int i;
-    int fd;
-    Elf32_Ehdr *ehdr32;
-    Elf64_Ehdr *ehdr64;
-    Elf *elf;
 
     if (argc < 2)
     {
@@ -36,100 +32,49 @@ int main(int argc, char **argv)
     for (i = 1; i < argc; i++)
     {
         printf("\n%s:\n", argv[i]);
-        int fd = open(argv[i], O_RDONLY);
-        if (fd < 0)
-        {
-            perror(argv[i]);
-            continue;
-        }
-
-        elf = elf_begin(fd, ELF_C_READ, NULL);
-        if (!elf || elf_kind(elf) != ELF_K_ELF)
-        {
-            fprintf(stderr, "%s: Not a valid ELF file.\n", argv[i]);
-            elf_end(elf);
-            close(fd);
-            continue;
-        }
-
-        if (elf_getheader(elf, &ehdr64) == 0)
-        {
-            if (ehdr64->e_ident[EI_CLASS] == ELFCLASS32)
-            {
-                display_symbols_32(elf);
-            }
-            else if (ehdr64->e_ident[EI_CLASS] == ELFCLASS64)
-            {
-                display_symbols_64(elf);
-            }
-            else
-            {
-                fprintf(stderr, "%s: Unknown ELF class.\n", argv[i]);
-            }
-        }
-
-        elf_end(elf);
-        close(fd);
+        handle_elf_file(argv[i]);
     }
 
     return (EXIT_SUCCESS);
 }
-
+        
 /**
- * display_symbols_32 - Extracts and prints symbols from ELF sections
- * @elf: Pointer to the ELF structure
+ * handle_elf_file - Processes a single ELF file
+ * @file_path: Path to the ELF file
  */
-void display_symbols_32(Elf *elf)
+void handle_elf_file(const char *file_path)
 {
-	Elf_Scn *section = NULL;
-	GElf_Shdr section_header;
-	Elf_Data *data;
-	GElf_Sym32 symbol;
-	size_t section_str_index;
-	size_t i;
+    int fd;
+    Elf *elf;
 
-	if (elf_getshdrstrndx(elf, &section_str_index) != 0)
-	{
-		fprintf(stderr, "Failed to get section header string index.\n");
-		return;
-	}
-
-	while ((section = elf_nextscn(elf, section)) != NULL)
-	{
-        if (!gelf_getshdr(section, &section_header)) {
-            fprintf(stderr, "Failed to get section header.\n");
-            continue;
-        }
-
-		if (section_header.sh_type != SHT_SYMTAB && section_header.sh_type != SHT_DYNSYM)
-			continue;
-
-		data = elf_getdata(section, NULL);
-		for (i = 0; i < section_header.sh_size / section_header.sh_entsize; i++)
-		{
-            GElf_Sym symbol;
-			if (gelf_getsym32(data, i, &symbol) != &symbol)
-				continue;
-
-			char *name = elf_strptr(elf, section_header.sh_link, symbol.st_name);
-			if (!name) {
-                fprintf(stderr, "Failed to get symbol name.\n");
-                name = "<no-name>";
-                }
-
-            char type = determine_symbol_type(&symbol, &section_header);
-
-            /* Print the symbol in the required format */
-            output_symbol(name, symbol.st_value, type);
-        }
+    fd = open(file_path, O_RDONLY);
+    if (fd < 0)
+    {
+        perror(file_path);
+        return;
     }
+
+    elf = elf_begin(fd, ELF_C_READ, NULL);
+    if (!elf || elf_kind(elf) != ELF_K_ELF)
+    {
+        fprintf(stderr, "%s: Not a valid ELF file.\n", file_path);
+        if (elf)
+            elf_end(elf);
+        close(fd);
+        return;
+    }
+
+    display_symbols(elf);
+
+    elf_end(elf);
+    close(fd);
 }
-			
+
 /**
- * display_symbols_64 - Extracts and prints symbols from ELF sections (64-bit)
+ * display_symbols - Extracts and prints symbols from ELF sections
  * @elf: Pointer to the ELF structure
  */
-void display_symbols_64(Elf *elf)
+void display_symbols(Elf *elf)
 {
     Elf_Scn *section = NULL;
     GElf_Shdr section_header;
@@ -164,95 +109,67 @@ void display_symbols_64(Elf *elf)
             char *name = elf_strptr(elf, section_header.sh_link, symbol.st_name);
             if (!name)
             {
+                fprintf(stderr, "Failed to get symbol name.\n");
                 name = "<no-name>";
             }
 
-            char type = determine_symbol_type64(&symbol, &section_header);
-            output_symbol(name, symbol.st_value, type, ELFCLASS64);
+            Elf_Class class = elf32(elf) ? ELFCLASS32 : ELFCLASS64;
+            char type = determine_symbol_type(&symbol, &section_header, class);
+
+            /* Print the symbol in the required format */
+            output_symbol(name, symbol.st_value, type);
         }
     }
-}
-
-//**
- * determine_symbol_type32 - Determines the type of a symbol (32-bit)
- * @sym: Pointer to the symbol structure
- * @shdr: Pointer to the section header structure
- *
- * Return: Character representing the symbol type
- */
-char determine_symbol_type32(GElf_Sym32 *sym, GElf_Shdr *shdr)
-{
-    if (GELF_ST_BIND(sym->st_info) == STB_WEAK)
-    {
-        return (GELF_ST_TYPE(sym->st_info) == STT_OBJECT) ? 'V' : 'W';
-    }
-    if (sym->st_shndx == SHN_UNDEF)
-    {
-        return ('U');
-    }
-    if (sym->st_shndx == SHN_ABS)
-    {
-        return ('A');
-    }
-    if (sym->st_shndx == SHN_COMMON)
-    {
-        return ('C');
-    }
-    if (shdr == NULL)
-    {
-        return ('?');
-    }
-
-    if (shdr->sh_type == SHT_PROGBITS && (shdr->sh_flags & SHF_EXECINSTR))
-    {
-        return ('T');
-    }
-
-    if (shdr->sh_flags & SHF_WRITE)
-    {
-        if (shdr->sh_type == SHT_NOBITS)
-        {
-            return ('B');
-        }
-        return ('D');
-    }
-
-    if (shdr->sh_flags & SHF_ALLOC)
-    {
-        return ('R');
-    }
-
-    return ('?');
 }
 
 /**
- * determine_symbol_type64 - Determines the type of a symbol (64-bit)
+ * determine_symbol_type - Determines the type of a symbol
  * @sym: Pointer to the symbol structure
  * @shdr: Pointer to the section header structure
+ * @class: ELF class (32 or 64)
  *
  * Return: Character representing the symbol type
  */
-char determine_symbol_type64(GElf_Sym *sym, GElf_Shdr *shdr)
+char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr, Elf_Class class)
 {
-    if (GELF_ST_BIND(sym->st_info) == STB_WEAK)
+    if (class == ELFCLASS32)
     {
-        return (GELF_ST_TYPE(sym->st_info) == STT_OBJECT) ? 'V' : 'W';
+        GElf_Sym32 *sym32 = (GElf_Sym32 *)sym;
+        if (GELF_ST_BIND(sym32->st_info) == STB_WEAK)
+        {
+            return (GELF_ST_TYPE(sym32->st_info) == STT_OBJECT) ? 'V' : 'W';
+        }
+        if (sym32->st_shndx == SHN_UNDEF)
+        {
+            return ('U');
+        }
+        if (sym32->st_shndx == SHN_ABS)
+        {
+            return ('A');
+        }
+        if (sym32->st_shndx == SHN_COMMON)
+        {
+            return ('C');
+        }
     }
-    if (sym->st_shndx == SHN_UNDEF)
+    else
     {
-        return ('U');
-    }
-    if (sym->st_shndx == SHN_ABS)
-    {
-        return ('A');
-    }
-    if (sym->st_shndx == SHN_COMMON)
-    {
-        return ('C');
-    }
-    if (shdr == NULL)
-    {
-        return ('?');
+        if (GELF_ST_BIND(sym->st_info) == STB_WEAK)
+        {
+            return (GELF_ST_TYPE(sym->st_info) == STT_OBJECT) ? 'V' : 'W';
+        }
+        if (sym->st_shndx == SHN_UNDEF)
+        {
+            return ('U');
+        }
+        if (sym->st_shndx == SHN_ABS)
+        {
+            return ('A');
+        }
+        if (sym->st_shndx == SHN_COMMON)
+        {
+            return ('C');
+        }
     }
 
     if (shdr->sh_type == SHT_PROGBITS && (shdr->sh_flags & SHF_EXECINSTR))
@@ -282,16 +199,12 @@ char determine_symbol_type64(GElf_Sym *sym, GElf_Shdr *shdr)
  * @name: Name of the symbol
  * @addr: Address of the symbol
  * @type: Type of the symbol
- * @elf_class: ELF class (32-bit or 64-bit)
  */
-void output_symbol(const char *name, Elf64_Addr addr, char type, int elf_class)
+void output_symbol(const char *name, Elf64_Addr addr, char type)
 {
-    if (elf_class == ELFCLASS64)
-    {
-        printf("%016lx %c %s\n", addr, type, name);  // For 64-bit addresses
-    }
-    else if (elf_class == ELFCLASS32)
-    {
-        printf("%08lx %c %s\n", addr, type, name);  // For 32-bit addresses
-    }
+    /* Handle undefined and weak symbols separately */
+    if (type == 'U' || type == 'w')
+        printf("                 %c %s\n", type, name);
+    else
+        printf("%016llx %c %s\n", (unsigned long long)addr, type, name);
 }
