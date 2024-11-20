@@ -114,7 +114,7 @@ void display_symbols(Elf *elf)
             char type = determine_symbol_type(&symbol, &section_header);
 
             /* Print the symbol in the required format */
-            output_symbol_symbol(name, symbol.st_value, type);
+            output_symbol(name, symbol.st_value, type);
         }
     }
 }
