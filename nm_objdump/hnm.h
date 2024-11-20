@@ -1,16 +1,16 @@
-#ifndef _HNM_H_
-#define _HNM_H_
+#ifndef HNM_H
+#define HNM_H
 
-#include <elf.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <gelf.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
 
-/* Function Prototypes */
+/* Function prototypes */
 int main(int argc, char **argv);
 void handle_elf_file(const char *file_path);
 void display_symbols(Elf *elf);
-char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr, Elf_Class class);
+char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr);
 void output_symbol(const char *name, Elf64_Addr addr, char type);
 
-#endif
+#endif /* HNM_H */

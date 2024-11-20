@@ -44,30 +44,30 @@ int main(int argc, char **argv)
  */
 void handle_elf_file(const char *file_path)
 {
-    int fd;
-    Elf *elf;
+	int fd;
+	Elf *elf;
 
-    fd = open(file_path, O_RDONLY);
-    if (fd < 0)
-    {
-        perror(file_path);
-        return;
-    }
+	fd = open(file_path, O_RDONLY);
+	if (fd < 0)
+	{
+		perror(file_path);
+		return;
+	}
 
-    elf = elf_begin(fd, ELF_C_READ, NULL);
-    if (!elf || elf_kind(elf) != ELF_K_ELF)
-    {
-        fprintf(stderr, "%s: Not a valid ELF file.\n", file_path);
-        if (elf)
-            elf_end(elf);
-        close(fd);
-        return;
-    }
+	elf = elf_begin(fd, ELF_C_READ, NULL);
+	if (!elf || elf_kind(elf) != ELF_K_ELF)
+	{
+		fprintf(stderr, "%s: Not a valid ELF file.\n", file_path);
+		if (elf)
+			elf_end(elf);
+		close(fd);
+		return;
+	}
 
-    display_symbols(elf);
+	display_symbols(elf);
 
-    elf_end(elf);
-    close(fd);
+	elf_end(elf);
+	close(fd);
 }
 
 /**
@@ -76,123 +76,93 @@ void handle_elf_file(const char *file_path)
  */
 void display_symbols(Elf *elf)
 {
-    Elf_Scn *section = NULL;
-    GElf_Shdr section_header;
-    Elf_Data *data;
-    GElf_Sym symbol;
-    size_t section_str_index;
-    size_t i;
+	Elf_Scn *section = NULL;
+	GElf_Shdr section_header;
+	Elf_Data *data;
+	GElf_Sym symbol;
+	size_t section_str_index;
+	size_t i;
 
-    if (elf_getshdrstrndx(elf, &section_str_index) != 0)
-    {
-        fprintf(stderr, "Failed to get section header string index.\n");
-        return;
-    }
+	if (elf_getshdrstrndx(elf, &section_str_index) != 0)
+	{
+		fprintf(stderr, "Failed to get section header string index.\n");
+		return;
+	}
 
-    while ((section = elf_nextscn(elf, section)) != NULL)
-    {
-        if (!gelf_getshdr(section, &section_header))
-        {
+	while ((section = elf_nextscn(elf, section)) != NULL)
+	{
+        if (!gelf_getshdr(section, &section_header)) {
             fprintf(stderr, "Failed to get section header.\n");
             continue;
         }
 
-        if (section_header.sh_type != SHT_SYMTAB && section_header.sh_type != SHT_DYNSYM)
-            continue;
+		if (section_header.sh_type != SHT_SYMTAB && section_header.sh_type != SHT_DYNSYM)
+			continue;
 
-        data = elf_getdata(section, NULL);
-        for (i = 0; i < section_header.sh_size / section_header.sh_entsize; i++)
-        {
-            if (gelf_getsym(data, i, &symbol) != &symbol)
-                continue;
+		data = elf_getdata(section, NULL);
+		for (i = 0; i < section_header.sh_size / section_header.sh_entsize; i++)
+		{
+            GElf_Sym symbol;
+			if (gelf_getsym(data, i, &symbol) != &symbol)
+				continue;
 
-            char *name = elf_strptr(elf, section_header.sh_link, symbol.st_name);
-            if (!name)
-            {
+			char *name = elf_strptr(elf, section_header.sh_link, symbol.st_name);
+			if (!name) {
                 fprintf(stderr, "Failed to get symbol name.\n");
                 name = "<no-name>";
-            }
+                }
 
-            Elf_Class class = elf32(elf) ? ELFCLASS32 : ELFCLASS64;
-            char type = determine_symbol_type(&symbol, &section_header, class);
+            char type = determine_symbol_type(&symbol, &section_header);
 
             /* Print the symbol in the required format */
             output_symbol(name, symbol.st_value, type);
         }
     }
 }
+			
 
 /**
  * determine_symbol_type - Determines the type of a symbol
  * @sym: Pointer to the symbol structure
  * @shdr: Pointer to the section header structure
- * @class: ELF class (32 or 64)
  *
  * Return: Character representing the symbol type
  */
-char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr, Elf_Class class)
-{
-    if (class == ELFCLASS32)
-    {
-        GElf_Sym32 *sym32 = (GElf_Sym32 *)sym;
-        if (GELF_ST_BIND(sym32->st_info) == STB_WEAK)
-        {
-            return (GELF_ST_TYPE(sym32->st_info) == STT_OBJECT) ? 'V' : 'W';
-        }
-        if (sym32->st_shndx == SHN_UNDEF)
-        {
-            return ('U');
-        }
-        if (sym32->st_shndx == SHN_ABS)
-        {
-            return ('A');
-        }
-        if (sym32->st_shndx == SHN_COMMON)
-        {
-            return ('C');
-        }
+char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr) {
+    if (GELF_ST_BIND(sym->st_info) == STB_WEAK) {
+        return (GELF_ST_TYPE(sym->st_info) == STT_OBJECT) ? 'V' : 'W';
     }
-    else
-    {
-        if (GELF_ST_BIND(sym->st_info) == STB_WEAK)
-        {
-            return (GELF_ST_TYPE(sym->st_info) == STT_OBJECT) ? 'V' : 'W';
-        }
-        if (sym->st_shndx == SHN_UNDEF)
-        {
-            return ('U');
-        }
-        if (sym->st_shndx == SHN_ABS)
-        {
-            return ('A');
-        }
-        if (sym->st_shndx == SHN_COMMON)
-        {
-            return ('C');
-        }
+    if (sym->st_shndx == SHN_UNDEF) {
+        return ('U');
+    }
+    if (sym->st_shndx == SHN_ABS) {
+        return ('A');
+    }
+    if (sym->st_shndx == SHN_COMMON) {
+        return ('C');
+    }
+    if (shdr == NULL) {
+        return ('?');
     }
 
-    if (shdr->sh_type == SHT_PROGBITS && (shdr->sh_flags & SHF_EXECINSTR))
-    {
+    if (shdr->sh_type == SHT_PROGBITS && (shdr->sh_flags & SHF_EXECINSTR)) {
         return ('T');
     }
 
-    if (shdr->sh_flags & SHF_WRITE)
-    {
-        if (shdr->sh_type == SHT_NOBITS)
-        {
+    if (shdr->sh_flags & SHF_WRITE) {
+        if (shdr->sh_type == SHT_NOBITS) {
             return ('B');
         }
         return ('D');
     }
 
-    if (shdr->sh_flags & SHF_ALLOC)
-    {
+    if (shdr->sh_flags & SHF_ALLOC) {
         return ('R');
     }
 
     return ('?');
 }
+
 
 /**
  * output_symbol - Prints a symbol's details in the required format
@@ -202,9 +172,16 @@ char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr, Elf_Class class)
  */
 void output_symbol(const char *name, Elf64_Addr addr, char type)
 {
-    /* Handle undefined and weak symbols separately */
+    /*Handle undefined and weak symbols separately*/
     if (type == 'U' || type == 'w')
         printf("                 %c %s\n", type, name);
-    else
+    else if (type == 'A') {
         printf("%016llx %c %s\n", (unsigned long long)addr, type, name);
+    } else if (type == 'B') {
+        printf("%016llx %c %s\n", (unsigned long long)addr, type, name);
+    } else if (type == 'T' || type == 't') {
+        printf("%016llx %c %s\n", (unsigned long long)addr, type, name);
+    } else {
+        printf("%016llx %c %s\n", (unsigned long long)addr, type, name);
+    }
 }
