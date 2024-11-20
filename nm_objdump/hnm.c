@@ -171,8 +171,16 @@ char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr) {
  */
 void output_symbol(const char *name, Elf64_Addr addr, char type)
 {
+    /*Handle undefined and weak symbols separately*/
     if (type == 'U' || type == 'w')
-    printf("                 %c %s\n", type, name);
-    else
-        printf("%016lx %c %s\n", addr, type, name);
+        printf("                 %c %s\n", type, name);
+    else if (type == 'A') {
+        printf("%016lx %c %s\n", (unsigned long long)addr, type, name);
+    } else if (type == 'B') {
+        printf("%016lx %c %s\n", (unsigned long long)addr, type, name);
+    } else if (type == 'T' || type == 't') {
+        printf("%016lx %c %s\n", (unsigned long long)addr, type, name);
+    } else {
+        printf("%016lx %c %s\n", (unsigned long long)addr, type, name);
+    }
 }
