@@ -6,16 +6,6 @@
 #include <string.h>
 #include "hnm.h"
 
-
-typedef struct symbol_entry {
-    char *name;
-    Elf64_Addr addr;
-    char type;
-} symbol_entry;
-
-static symbol_entry *symbols = NULL;
-static size_t num_symbols = 0;
-
 /**
  * main - Entry point for the hnm program
  * @argc: Argument count
@@ -41,7 +31,8 @@ int main(int argc, char **argv)
 
     for (i = 1; i < argc; i++)
     {
-         handle_elf_file(argv[i]);
+        printf("\n%s:\n", argv[i]);
+        handle_elf_file(argv[i]);
     }
 
     return (EXIT_SUCCESS);
@@ -100,8 +91,10 @@ void display_symbols(Elf *elf)
 
 	while ((section = elf_nextscn(elf, section)) != NULL)
 	{
-		if (gelf_getshdr(section, &section_header) != &section_header)
-			continue;
+        if (!gelf_getshdr(section, &section_header)) {
+            fprintf(stderr, "Failed to get section header.\n");
+            continue;
+        }
 
 		if (section_header.sh_type != SHT_SYMTAB && section_header.sh_type != SHT_DYNSYM)
 			continue;
@@ -113,35 +106,18 @@ void display_symbols(Elf *elf)
 				continue;
 
 			char *name = elf_strptr(elf, section_header.sh_link, symbol.st_name);
-			if (!name)
-			name = "";
+			if (!name) {
+                fprintf(stderr, "Failed to get symbol name.\n");
+                name = "<no-name>";
+                }
 
             char type = determine_symbol_type(&symbol, &section_header);
 
-            /* Store symbol in list */
-            symbols = realloc(symbols, sizeof(symbol_entry) * (num_symbols + 1));
-            if (!symbols) {
-                fprintf(stderr, "Memory allocation error.\n");
-                return;
-            }
-            symbols[num_symbols].name = strdup(name);
-            symbols[num_symbols].addr = symbol.st_value;
-            symbols[num_symbols].type = type;
-            num_symbols++;
+            /* Print the symbol in the required format */
+            print_symbol(name, symbol.st_value, type);
         }
     }
-
-    /* Sort and display symbols */
-    qsort(symbols, num_symbols, sizeof(symbol_entry), compare_symbols);
-    for (i = 0; i < num_symbols; i++) {
-        output_symbol(symbols[i].name, symbols[i].addr, symbols[i].type);
-        free(symbols[i].name); /* Free allocated name */
-    }
-    free(symbols);
-    symbols = NULL;
-    num_symbols = 0;
 }
-
 			
 
 /**
@@ -153,11 +129,8 @@ void display_symbols(Elf *elf)
  */
 char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr)
 {
-	 if (GELF_ST_BIND(sym->st_info) == STB_WEAK) {
-        if (GELF_ST_TYPE(sym->st_info) == STT_OBJECT)
-            return 'V';
-        return 'W';
-    }
+	 if (GELF_ST_BIND(sym->st_info) == STB_WEAK)
+     return (GELF_ST_TYPE(sym->st_info) == STT_OBJECT) ? 'V' : 'W';
     if (sym->st_shndx == SHN_UNDEF)
         return 'U';
     if (sym->st_shndx == SHN_ABS)
@@ -166,31 +139,13 @@ char determine_symbol_type(GElf_Sym *sym, GElf_Shdr *shdr)
         return 'C';
     if (shdr->sh_type == SHT_NOBITS && (shdr->sh_flags & SHF_ALLOC))
         return 'B';
-    if (shdr->sh_type == SHT_PROGBITS && (shdr->sh_flags & SHF_ALLOC)) {
+    if (shdr->sh_type == SHT_PROGBITS)
+    {
         if (shdr->sh_flags & SHF_EXECINSTR)
             return 'T';
-        return 'R';
+        return (shdr->sh_flags & SHF_ALLOC) ? 'R' : '?';
     }
-    return '?';
-}
-
-/**
- * compare_symbols - Comparison function for sorting symbols
- * @a: First symbol entry
- * @b: Second symbol entry
- *
- * Return: Negative, zero, or positive based on comparison
- */
-int compare_symbols(const void *a, const void *b)
-{
-    const symbol_entry *sym_a = (const symbol_entry *)a;
-    const symbol_entry *sym_b = (const symbol_entry *)b;
-
-    if (sym_a->addr < sym_b->addr)
-        return -1;
-    if (sym_a->addr > sym_b->addr)
-        return 1;
-    return 0;
+    return (shdr->sh_flags & SHF_WRITE) ? 'D' : '?';
 }
 
 
@@ -205,5 +160,5 @@ void output_symbol(const char *name, Elf64_Addr addr, char type)
     if (type == 'U' || type == 'w')
         printf("                 %c %s\n", type, name);
     else
-        printf("%08lx %c %s\n", (unsigned long)addr, type, name);
+        printf("%016lx %c %s\n", addr, type, name);
 }
