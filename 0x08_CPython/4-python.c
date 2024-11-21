@@ -1,36 +1,36 @@
 #include <Python.h>
 #include <stdio.h>
+#include <limits.h>
 
-/**
- * print_python_string - Prints information about a Python string object
- * @p: Pointer to a Python object
- */
-void print_python_string(PyObject *p)
+void print_python_int(PyObject *p)
 {
-    setbuf(stdout, NULL);
-    printf("[.] string object info\n");
+    unsigned long int value;
+    long sign;
 
-    /* Verify if the object is a valid Python string */
-    if (!PyUnicode_Check(p))
+    if (!PyLong_Check(p))
     {
-        printf("  [ERROR] Invalid String Object\n");
+        printf("Invalid Int Object\n");
         return;
     }
 
-    /* Get the string length and representation type */
-    Py_ssize_t length = PyUnicode_GET_LENGTH(p);
-    const char *kind = PyUnicode_IS_COMPACT_ASCII(p) ? "compact ascii" : "compact unicode object";
-
-    printf("  type: %s\n", kind);
-    printf("  length: %ld\n", length);
-
-    /* Convert Python string to UTF-8 for printing */
-    const char *utf8_str = PyUnicode_AsUTF8(p);
-    if (utf8_str == NULL)
+    sign = PyLong_Sign(p);
+    
+    if (sign == -1)
     {
-        printf("  [ERROR] Unable to decode string\n");
+        /*Handle negative value*/
+        value = (unsigned long int)(-PyLong_AsLong(p));
+    }
+    else
+    {
+        /*Handle positive value*/
+        value = (unsigned long int)PyLong_AsLong(p);
+    }
+
+    if (value > ULONG_MAX)
+    {
+        printf("C unsigned long int overflow\n");
         return;
     }
 
-    printf("  value: %s\n", utf8_str);
+    printf("%lu\n", value);
 }
