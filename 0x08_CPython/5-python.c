@@ -1,51 +1,47 @@
-#include <Python.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <Python.h>
 
 /**
- * print_python_int - Prints a Python integer object.
- * @p: Pointer to a Python object.
- *
- * Description:
- * - Converts the Python integer to a C unsigned long integer.
- * - Prints the value or an error message if the object is invalid.
+ * print_python_int - Prints Python integer info
+ * @p: Python object
  */
 void print_python_int(PyObject *p)
 {
-    unsigned long int result = 0;
-    Py_ssize_t size, i;
-    unsigned long current_digit;
-    PyLongObject *long_obj;
+    unsigned long number = 0;
+    ssize_t i = 0, size = 0, negative = 0;
+    int shift = 0;
 
-    setbuf(stdout, NULL);
-    printf("[.] integer object info\n");
-
-    /* Check if the object is a valid Python integer */
+    /** Check if the object is a valid Python integer **/
     if (!PyLong_Check(p))
     {
-        printf("  [ERROR] Invalid Integer Object\n");
+        printf("Invalid Int Object\n");
         return;
     }
 
-    long_obj = (PyLongObject *)p;
-    size = Py_ABS(long_obj->ob_base.ob_size);
+    /** Get the size and check if the integer is negative **/
+    size = ((PyVarObject *)p)->ob_size;
+    negative = size < 0;
+    size = negative ? -size : size;
 
-    /* Check if the number is too large for a C unsigned long */
-    if (size > (unsigned long)(sizeof(unsigned long) * 8 / PyLong_SHIFT))
+    /** Handle overflow if the number is too large for unsigned long **/
+    if (size == 3 && (((PyLongObject *)p)->ob_digit[2] > 0xf || size > 3))
     {
-        printf("  C unsigned long int overflow\n");
+        printf("C unsigned long int overflow\n");
         return;
     }
 
-    /* Convert Python integer digits to C unsigned long */
+    /** Iterate through the digits of the Python integer **/
     for (i = 0; i < size; i++)
     {
-        current_digit = long_obj->ob_digit[i];
-        result += current_digit << (i * PyLong_SHIFT);
+        shift = PyLong_SHIFT * i;
+        unsigned long sub =
+            ((unsigned long)((PyLongObject *)p)->ob_digit[i]) * (1UL << (shift));
+        number += sub;
     }
 
-    /* Print the resulting unsigned long */
-    if (long_obj->ob_base.ob_size < 0)
-        printf("  -%lu\n", result);
-    else
-        printf("  %lu\n", result);
+    /** Print the number, handling the sign **/
+    if (negative)
+        printf("-");
+    printf("%lu\n", number);
 }
