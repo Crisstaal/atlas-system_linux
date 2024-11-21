@@ -10,8 +10,9 @@
 void print_python_int(PyObject *p)
 {
     unsigned long number = 0;
-    ssize_t i = 0, size = 0, negative = 0;
-    int shift = 0;
+    ssize_t i, size, negative;
+
+    setbuf(stdout, NULL);
 
     /** Check if the object is a valid Python integer **/
     if (!PyLong_Check(p))
@@ -23,7 +24,7 @@ void print_python_int(PyObject *p)
     negative = size < 0;
     size = negative ? -size : size;
 
-   if (size == 3 && (((PyLongObject *)p)->ob_digit[2] > 0xf || size > 3))
+  if (size > 3 || (size == 3 && ((PyLongObject *)p)->ob_digit[2] > 0xf))
 	{
 		printf("C unsigned long int overflow\n");
 		return;
@@ -32,7 +33,7 @@ void print_python_int(PyObject *p)
     /** Iterate through the digits of the Python integer **/
     for (i = 0; i < size; i++)
     {
-        shift = PyLong_SHIFT * i;
+       int shift = PyLong_SHIFT * i;
         unsigned long sub =
             ((unsigned long)((PyLongObject *)p)->ob_digit[i]) * (1UL << (shift));
         number += sub;
