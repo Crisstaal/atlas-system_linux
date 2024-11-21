@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Python.h>
-#include <time.h>  // Include time.h for struct timespec
+#include <time.h>
 
 /**
  * print_python_int - Prints Python integer info
@@ -20,20 +20,22 @@ void print_python_int(PyObject *p)
         printf("Invalid Int Object\n");
         return;
     }
+
     size = ((PyVarObject *)p)->ob_size;
     negative = size < 0;
     size = negative ? -size : size;
 
-  if (size > 3 || (size == 3 && ((PyLongObject *)p)->ob_digit[2] > 0xf))
-	{
-		printf("C unsigned long int overflow\n");
-		return;
-	}
+    /** Check for overflow based on the size and PyLongObject's digits **/
+    if (size > 3 || (size == 3 && ((PyLongObject *)p)->ob_digit[2] > 0xf))
+    {
+        printf("C unsigned long int overflow\n");
+        return;
+    }
 
     /** Iterate through the digits of the Python integer **/
     for (i = 0; i < size; i++)
     {
-       int shift = PyLong_SHIFT * i;
+        int shift = PyLong_SHIFT * i;
         unsigned long sub =
             ((unsigned long)((PyLongObject *)p)->ob_digit[i]) * (1UL << (shift));
         number += sub;
@@ -42,5 +44,6 @@ void print_python_int(PyObject *p)
     /** Print the number, handling the sign **/
     if (negative)
         printf("-");
+
     printf("%lu\n", number);
 }
