@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Python.h>
+#include <time.h>  // Include time.h for struct timespec
 
 /**
  * print_python_int - Prints Python integer info
@@ -25,7 +26,7 @@ void print_python_int(PyObject *p)
     size = negative ? -size : size;
 
     /** Handle overflow if the number is too large for unsigned long **/
-    if (size == 3 && (((PyLongObject *)p)->ob_digit[2] > 0xf || size > 3))
+    if (size > (ssize_t)(sizeof(unsigned long) * 8 / PyLong_SHIFT))
     {
         printf("C unsigned long int overflow\n");
         return;
