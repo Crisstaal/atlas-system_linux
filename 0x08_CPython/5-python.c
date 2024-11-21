@@ -19,18 +19,15 @@ void print_python_int(PyObject *p)
         printf("Invalid Int Object\n");
         return;
     }
-
-    /** Get the size and check if the integer is negative **/
     size = ((PyVarObject *)p)->ob_size;
     negative = size < 0;
     size = negative ? -size : size;
 
-    /** Handle overflow if the number is too large for unsigned long **/
-    if (size > (ssize_t)(sizeof(unsigned long) * 8 / PyLong_SHIFT))
-    {
-        printf("C unsigned long int overflow\n");
-        return;
-    }
+   if (size == 3 && (((PyLongObject *)p)->ob_digit[2] > 0xf || size > 3))
+	{
+		printf("C unsigned long int overflow\n");
+		return;
+	}
 
     /** Iterate through the digits of the Python integer **/
     for (i = 0; i < size; i++)
