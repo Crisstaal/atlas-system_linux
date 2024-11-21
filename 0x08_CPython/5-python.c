@@ -1,6 +1,5 @@
 #include <Python.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 /**
  * print_python_int - Prints a Python integer object.
