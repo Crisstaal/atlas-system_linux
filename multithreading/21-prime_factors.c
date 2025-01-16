@@ -12,7 +12,7 @@
 void *prime_factors_task(void *param)
 {
     char *s = (char *)param;
-    list_t *factors = prime_factors(s);  // Reuse your existing prime_factors function
+    list_t *factors = prime_factors(s);
     return factors;
 }
 
