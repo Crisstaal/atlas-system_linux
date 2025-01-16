@@ -8,8 +8,8 @@
  */
 void blur_portion(blur_portion_t const *portion)
 {
-    size_t i, j, ki, kj;
-    int x, y;
+    size_t ki, kj;
+    size_t x, y;
     float r, g, b;
     size_t kernel_offset = portion->kernel->size / 2;
 
@@ -24,12 +24,11 @@ void blur_portion(blur_portion_t const *portion)
             {
                 for (kj = 0; kj < portion->kernel->size; kj++)
                 {
-                    int img_x = x + kj - kernel_offset;
-                    int img_y = y + ki - kernel_offset;
+                    size_t img_x = x + kj - kernel_offset;  // Change to size_t
+                    size_t img_y = y + ki - kernel_offset;  // Change to size_t
 
                     /* Boundary check */
-                    if (img_x >= 0 && img_x < (int)portion->img->w &&
-                        img_y >= 0 && img_y < (int)portion->img->h)
+                    if (img_x < portion->img->w && img_y < portion->img->h)
                     {
                         pixel_t *pixel = &portion->img->pixels[img_y * portion->img->w + img_x];
                         float kernel_value = portion->kernel->matrix[ki][kj];
