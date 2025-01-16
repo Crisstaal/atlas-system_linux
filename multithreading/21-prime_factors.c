@@ -10,7 +10,7 @@
  * @n: The number to check
  *
  * Return: 1 if prime, 0 if not
- */
+ *
 static int is_prime(unsigned long n)
 {
     unsigned long i;
@@ -23,7 +23,7 @@ static int is_prime(unsigned long n)
             return (0);
     }
     return (1);
-}
+}*/
 
 /**
  * prime_factors - Factorizes a number into its prime factors
