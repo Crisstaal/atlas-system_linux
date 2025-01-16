@@ -1,67 +1,80 @@
+#include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include "list.h"
+#include <unistd.h>
+#include "multithreading.h"
 
 /**
- * is_prime - Checks if a number is prime
- *
- * @n: The number to check
- *
- * Return: 1 if prime, 0 if not
- *
-static int is_prime(unsigned long n)
-{
-    unsigned long i;
-
-    if (n < 2)
-        return (0);
-    for (i = 2; i * i <= n; i++)
-    {
-        if (n % i == 0)
-            return (0);
-    }
-    return (1);
-}*/
-
-/**
- * prime_factors - Factorizes a number into its prime factors
- *
- * @s: The string representation of the number to factorize
- *
- * Return: A list_t structure containing the prime factors
+ * prime_factors_task - Executes the prime factorization task for a given number
+ * @param: The string representation of the number to be factorized
+ * Return: A pointer to the result list containing the prime factors
  */
-list_t *prime_factors(char const *s)
+void *prime_factors_task(void *param)
 {
-    list_t *factors;
-    unsigned long num;
-    unsigned long divisor;
+    char *s = (char *)param;
+    list_t *factors = prime_factors(s);  // Reuse your existing prime_factors function
+    return factors;
+}
 
-    /* Convert the string to an unsigned long */
-    num = strtoul(s, NULL, 10);
-    
-    /* Check if the number is valid */
-    if (num == 0)
-        return (NULL);
+/**
+ * create_task - Create a task for execution in the thread pool
+ * @entry: The function to be executed for the task
+ * @param: The parameter to be passed to the task function
+ * Return: A pointer to the created task structure
+ */
+task_t *create_task(task_entry_t entry, void *param)
+{
+    task_t *task = malloc(sizeof(task_t));
+    if (!task)
+        return NULL;
 
-    factors = list_init(malloc(sizeof(list_t)));
+    task->entry = entry;
+    task->param = param;
+    task->status = PENDING;
+    pthread_mutex_init(&task->lock, NULL);
 
-    /* Handle factorization */
-    divisor = 2;
-    while (num > 1)
+    return task;
+}
+
+/**
+ * destroy_task - Destroy a task and free its resources
+ * @task: The task to be destroyed
+ */
+void destroy_task(task_t *task)
+{
+    if (task)
     {
-        while (num % divisor == 0)
+        pthread_mutex_destroy(&task->lock);
+        free(task);
+    }
+}
+
+/**
+ * exec_tasks - Execute the list of tasks in the thread pool
+ * @tasks: A list of tasks to be executed
+ * Return: NULL
+ */
+void *exec_tasks(list_t const *tasks)
+{
+    node_t *node;
+    task_t *task;
+
+    for (node = tasks->head; node; node = node->next)
+    {
+        task = (task_t *)node->content;
+
+        /*Ensure that the task is executed only once*/
+        pthread_mutex_lock(&task->lock);
+        if (task->status == PENDING)
         {
-            list_add(factors, malloc(sizeof(unsigned long *)));
-            *((unsigned long *)factors->tail->content) = divisor;
-            num /= divisor;
+            task->status = STARTED;
+            tprintf("[%ld] [00] Started\n", pthread_self());
+            task->result = task->entry(task->param);
+            task->status = SUCCESS;
+            tprintf("[%ld] [00] Success\n", pthread_self());
         }
-        divisor++;
-        /* Skip even numbers greater than 2 */
-        if (divisor > 2 && divisor % 2 == 0)
-            divisor++;
+        pthread_mutex_unlock(&task->lock);
     }
 
-    return (factors);
+    return NULL;
 }
