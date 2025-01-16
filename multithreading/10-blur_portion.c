@@ -29,58 +29,58 @@ void blurPixel(const img_t *img, img_t *img_blur, const kernel_t *kernel,
     /** Iterate over the kernel to apply it to the pixel */
     for (i = 0, y = (ssize_t)px_y - k_radius; i < kernel->size; i++, y++)
     {
-        for (j = 0, x = (ssize_t)px_x - k_radius; j < kernel->size; j++, x++)
-        {
-            /** Boundary check */
-            if ((x >= 0 && (size_t)x < img->w) && (y >= 0 && (size_t)y < img->h))
-            {
-                weight += kernel->matrix[i][j];
-                px_i = (y * img->w) + x;
+        for (j = 0, x = (ssize_t)px_x - k_radius;
+		     j < kernel->size; j++, x++)
+		{
+			if ((x >= 0 && (size_t)x < img->w) &&
+			    (y >= 0 && (size_t)y < img->h))
+			{
+				weight += kernel->matrix[i][j];
+				px_i = (y * img->w) + x;
 
-                /** Apply kernel weights to pixel color channels */
-                r_total += (img->pixels + px_i)->r * kernel->matrix[i][j];
-                g_total += (img->pixels + px_i)->g * kernel->matrix[i][j];
-                b_total += (img->pixels + px_i)->b * kernel->matrix[i][j];
-            }
-        }
-    }
+				r_total += (img->pixels + px_i)->r *
+					kernel->matrix[i][j];
+				g_total += (img->pixels + px_i)->g *
+					kernel->matrix[i][j];
+				b_total += (img->pixels + px_i)->b *
+					kernel->matrix[i][j];
+			}
+		}
+	}
 
-    /** Normalize the color values with the total weight */
-    px_i = (px_y * img->w) + px_x;
-    (img_blur->pixels + px_i)->r = (uint8_t)(r_total / weight);
-    (img_blur->pixels + px_i)->g = (uint8_t)(g_total / weight);
-    (img_blur->pixels + px_i)->b = (uint8_t)(b_total / weight);
+	px_i = (px_y * img->w) + px_x;
+	(img_blur->pixels + px_i)->r = (uint8_t)(r_total / weight);
+	(img_blur->pixels + px_i)->g = (uint8_t)(g_total / weight);
+	(img_blur->pixels + px_i)->b = (uint8_t)(b_total / weight);
 }
 
+
 /**
- * blur_portion - Blurs a portion of an image using a Gaussian Blur.
- * @portion: Pointer to struct containing information needed to perform a blur
- *   operation on a portion of an image file.
+ * blur_portion - blurs a portion of an image using a Gaussian Blur
+ *
+ * @portion: pointer to struct containing information needed to perform a blur
+ *   operation on a portion of an image file
  */
 void blur_portion(blur_portion_t const *portion)
 {
-    size_t x, y, x_end, y_end;
+	size_t x, y, x_end, y_end;
 
-    /** Ensure valid input */
-    if (!portion || !portion->img || !portion->img_blur ||
-        !portion->kernel || !portion->kernel->matrix)
-        return;
+	if (!portion || !portion->img || !portion->img_blur ||
+	    !portion->kernel || !portion->kernel->matrix)
+		return;
 
-    /** Ensure valid portion dimensions and kernel size */
-    if (!portion->w || !portion->h ||
-        !(portion->kernel->size > 1 && portion->kernel->size % 2))
-        return;
+	if (!portion->w || !portion->h ||
+	    !(portion->kernel->size > 1 && portion->kernel->size % 2))
+		return;
 
-    /** Calculate the boundaries of the portion to blur */
-    y_end = portion->y + portion->h;
-    x_end = portion->x + portion->w;
-
-    /** Iterate over the portion and apply the blur to each pixel */
-    for (y = portion->y; y < y_end; y++)
-    {
-        for (x = portion->x; x < x_end; x++)
-        {
-            blurPixel(portion->img, portion->img_blur, portion->kernel, x, y);
-        }
-    }
+	y_end = portion->y + portion->h;
+	x_end = portion->x + portion->w;
+	for (y = portion->y; y < y_end; y++)
+	{
+		for (x = portion->x; x < x_end; x++)
+		{
+			blurPixel(portion->img, portion->img_blur,
+				  portion->kernel, x, y);
+		}
+	}
 }
