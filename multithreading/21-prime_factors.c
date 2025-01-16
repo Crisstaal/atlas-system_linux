@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "list.h"
+#include "multithreading.h"
 
 /***
  * is_prime - Checks if a number is prime
