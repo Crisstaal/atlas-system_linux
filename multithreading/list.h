@@ -40,6 +40,4 @@ list_t	*list_init(list_t *list);
 void	list_destroy(list_t *list, node_func_t free_func);
 void	list_each(list_t *list, node_func_t func);
 
-static int is_prime(unsigned long n);
-
 #endif /* LIST_H */
