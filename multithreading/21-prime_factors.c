@@ -1,80 +1,115 @@
-#include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
-#include "multithreading.h"
+#include <string.h>
+#include <ctype.h>
+#include "list.h"
+
+/* Function declarations */
+list_t *initialize_prime_list(char const *s);
+int find_prime_factors(list_t *prime_list, unsigned long *num);
+int append_remaining_prime(list_t *prime_list, unsigned long num);
 
 /**
- * prime_factors_task - Executes the prime factorization task for a given number
- * @param: The string representation of the number to be factorized
- * Return: A pointer to the result list containing the prime factors
+ * prime_factors - Factorizes a given number into its prime factors
+ * @s: A string representing the number to be factorized
+ * Return: A pointer to the list containing the prime factors
  */
-void *prime_factors_task(void *param)
+list_t *prime_factors(char const *s)
 {
-    char *s = (char *)param;
-    list_t *factors = prime_factors(s);
-    return factors;
-}
+    unsigned long num;
+    list_t *prime_list = initialize_prime_list(s);
 
-/**
- * create_task - Create a task for execution in the thread pool
- * @entry: The function to be executed for the task
- * @param: The parameter to be passed to the task function
- * Return: A pointer to the created task structure
- */
-task_t *create_task(task_entry_t entry, void *param)
-{
-    task_t *task = malloc(sizeof(task_t));
-    if (!task)
-        return NULL;
+    if (!prime_list)
+        return (NULL); /* Return NULL if input is invalid or allocation fails */
 
-    task->entry = entry;
-    task->param = param;
-    task->status = PENDING;
-    pthread_mutex_init(&task->lock, NULL);
-
-    return task;
-}
-
-/**
- * destroy_task - Destroy a task and free its resources
- * @task: The task to be destroyed
- */
-void destroy_task(task_t *task)
-{
-    if (task)
+    num = strtoul(s, NULL, 10);
+    
+    /* Add prime factors of the number */
+    if (find_prime_factors(prime_list, &num) == -1)
     {
-        pthread_mutex_destroy(&task->lock);
-        free(task);
+        list_destroy(prime_list, free);
+        free(prime_list);
+        return (NULL);
     }
+
+    /* Add any remaining prime factor larger than sqrt(num) */
+    if (append_remaining_prime(prime_list, num) == -1)
+    {
+        list_destroy(prime_list, free);
+        free(prime_list);
+        return (NULL);
+    }
+
+    return (prime_list); /* Return the list containing all prime factors */
 }
 
 /**
- * exec_tasks - Execute the list of tasks in the thread pool
- * @tasks: A list of tasks to be executed
- * Return: NULL
+ * initialize_prime_list - Creates and initializes the list for prime factors
+ * @s: String representation of the number to be factored
+ * Return: A pointer to the initialized list or NULL if there's an error
  */
-void *exec_tasks(list_t const *tasks)
+list_t *initialize_prime_list(char const *s)
 {
-    node_t *node;
-    task_t *task;
+    list_t *prime_list = malloc(sizeof(list_t));
 
-    for (node = tasks->head; node; node = node->next)
+    if (!prime_list || *s == '\0')
     {
-        task = (task_t *)node->content;
+        free(prime_list);
+        return (NULL); /* Memory allocation failure or invalid input */
+    }
 
-        /*Ensure that the task is executed only once*/
-        pthread_mutex_lock(&task->lock);
-        if (task->status == PENDING)
+    list_init(prime_list); /* Initialize the list */
+    return (prime_list);
+}
+
+/**
+ * find_prime_factors - Extracts prime factors of the given number and adds them to the list
+ * @prime_list: The list to store the prime factors
+ * @num: A pointer to the number being factorized
+ * Return: 0 on success, -1 if memory allocation fails
+ */
+int find_prime_factors(list_t *prime_list, unsigned long *num)
+{
+    unsigned long prime = 2;
+    unsigned long *temp;
+
+    /* Loop through possible factors up to sqrt(num) */
+    while (prime * prime <= *num)
+    {
+        while (*num % prime == 0)
         {
-            task->status = STARTED;
-            tprintf("[%ld] [00] Started\n", pthread_self());
-            task->result = task->entry(task->param);
-            task->status = SUCCESS;
-            tprintf("[%ld] [00] Success\n", pthread_self());
-        }
-        pthread_mutex_unlock(&task->lock);
-    }
+            temp = malloc(sizeof(unsigned long));
+            if (!temp)
+                return (-1); /* Memory allocation failure */
 
-    return NULL;
+            *temp = prime;  /* Store the current prime factor */
+            list_add(prime_list, temp);  /* Add to the prime list */
+            *num /= prime; /* Reduce the number by the prime factor */
+        }
+        prime += 1 + (prime != 2); /* Skip even numbers after 2 */
+    }
+    return (0);
+}
+
+/**
+ * append_remaining_prime - Adds the last prime factor if greater than sqrt(num)
+ * @prime_list: The list to store the prime factors
+ * @num: The remaining value after factorization
+ * Return: 0 on success, -1 on failure (e.g., memory allocation error)
+ */
+int append_remaining_prime(list_t *prime_list, unsigned long num)
+{
+    unsigned long *temp;
+
+    /* If num is still greater than 2, it's a prime factor */
+    if (num >= 2)
+    {
+        temp = malloc(sizeof(unsigned long));
+        if (!temp)
+            return (-1); /* Memory allocation failure */
+
+        *temp = num;  /* Store the remaining prime factor */
+        list_add(prime_list, temp);  /* Add it to the prime list */
+    }
+    return (0);
 }
