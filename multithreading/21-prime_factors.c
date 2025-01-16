@@ -1,4 +1,5 @@
 #include "multithreading.h"
+#include <stdlib.h>
 
 /**
  * prime_factors - prime factors
