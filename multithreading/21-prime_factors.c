@@ -1,43 +1,67 @@
-#include "multithreading.h"
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include "list.h"
 
 /**
- * prime_factors - prime factors
- * @s: string
- * Return: a list with the prime factors
+ * is_prime - Checks if a number is prime
+ *
+ * @n: The number to check
+ *
+ * Return: 1 if prime, 0 if not
  */
+static int is_prime(unsigned long n)
+{
+    unsigned long i;
 
+    if (n < 2)
+        return (0);
+    for (i = 2; i * i <= n; i++)
+    {
+        if (n % i == 0)
+            return (0);
+    }
+    return (1);
+}
+
+/**
+ * prime_factors - Factorizes a number into its prime factors
+ *
+ * @s: The string representation of the number to factorize
+ *
+ * Return: A list_t structure containing the prime factors
+ */
 list_t *prime_factors(char const *s)
 {
-	list_t *list = NULL;
-	unsigned long n = 0, i = 0, *prime = NULL;
+    list_t *factors;
+    unsigned long num;
+    unsigned long divisor;
 
-	if (!s)
-		return (list);
+    /* Convert the string to an unsigned long */
+    num = strtoul(s, NULL, 10);
+    
+    /* Check if the number is valid */
+    if (num == 0)
+        return (NULL);
 
-	list = malloc(sizeof(*list));
-	if (!list)
-		return (list);
-	list = list_init(list), n = strtoul(s, NULL, 10);
+    factors = list_init(malloc(sizeof(list_t)));
 
-	for (i = 2; (i * i) <= n; i += (i == 2) ? 1 : 2)
-	{
+    /* Handle factorization */
+    divisor = 2;
+    while (num > 1)
+    {
+        while (num % divisor == 0)
+        {
+            list_add(factors, malloc(sizeof(unsigned long *)));
+            *((unsigned long *)factors->tail->content) = divisor;
+            num /= divisor;
+        }
+        divisor++;
+        /* Skip even numbers greater than 2 */
+        if (divisor > 2 && divisor % 2 == 0)
+            divisor++;
+    }
 
-		while (n % i == 0)
-		{
-			prime = calloc(1, sizeof(unsigned long));
-			*prime = i;
-			list_add(list, prime);
-			n /= i;
-		}
-	}
-
-	if (n != 1)
-	{
-		prime = calloc(1, sizeof(unsigned long));
-		*prime = n;
-		list_add(list, prime);
-	}
-
-	return (list);
+    return (factors);
 }
