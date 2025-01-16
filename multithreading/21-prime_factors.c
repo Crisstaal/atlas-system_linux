@@ -1,63 +1,42 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include "list.h"
 #include "multithreading.h"
 
-/***
- * is_prime - Checks if a number is prime
- *
- * @n: The number to check
- *
- * Return: 1 if prime, 0 if not
- ***/
-static int is_prime(unsigned long n)
-{
-    unsigned long i;
+/**
+ * prime_factors - prime factors
+ * @s: string
+ * Return: a list with the prime factors
+ */
 
-    if (n < 2)
-        return (0);
-    for (i = 2; i * i <= n; i++)
-    {
-        if (n % i == 0)
-            return (0);
-    }
-    return (1);
-}
-
-/***
- * prime_factors - Factorizes a number into its prime factors
- *
- * @s: The string representation of the number to factorize
- *
- * Return: A list of prime factors
- ***/
 list_t *prime_factors(char const *s)
 {
-    unsigned long n;
-    list_t *factors = list_create();
-    node_t *node;
-    char *endptr;
+	list_t *list = NULL;
+	unsigned long n = 0, i = 0, *prime = NULL;
 
-    n = strtoul(s, &endptr, 10);
-    if (*endptr != '\0' || n == 0)
-    {
-        return (NULL);  // invalid input or zero number
-    }
+	if (!s)
+		return (list);
 
-    /*** Find factors starting from 2 ***/
-    for (unsigned long i = 2; i <= n; i++)
-    {
-        while (n % i == 0 && is_prime(i))
-        {
-            node = list_node_create(&i);
-            list_add(factors, node);
-            n /= i;
-        }
-        if (n == 1)
-            break;
-    }
+	list = malloc(sizeof(*list));
+	if (!list)
+		return (list);
+	list = list_init(list), n = strtoul(s, NULL, 10);
 
-    return (factors);
+	for (i = 2; (i * i) <= n; i += (i == 2) ? 1 : 2)
+	{
+
+		while (n % i == 0)
+		{
+			prime = calloc(1, sizeof(unsigned long));
+			*prime = i;
+			list_add(list, prime);
+			n /= i;
+		}
+	}
+
+	if (n != 1)
+	{
+		prime = calloc(1, sizeof(unsigned long));
+		*prime = n;
+		list_add(list, prime);
+	}
+
+	return (list);
 }
