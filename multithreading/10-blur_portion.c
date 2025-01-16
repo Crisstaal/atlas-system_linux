@@ -58,33 +58,45 @@ void blurPixel(const img_t *img, img_t *img_blur, const kernel_t *kernel,
  * @portion: pointer to struct containing information needed to perform a blur
  *   operation on a portion of an image file
  */
-void blur_portion(blur_portion_t *portion)
+void blur_portion(blur_portion_t const *portion)
 {
-    size_t x, y, x_end, y_end;
-
-    if (!portion || !portion->img || !portion->img_blur ||
-        !portion->kernel || !portion->kernel->matrix)
+    size_t x, y, kx, ky;
+    float sum_r, sum_g, sum_b;
+    size_t kernel_half = portion->kernel->size / 2;
+    
+    if (!portion || !portion->img || !portion->img_blur || !portion->kernel || !portion->kernel->matrix)
         return;
 
-    if (!portion->w || !portion->h ||
-        !(portion->kernel->size > 1 && portion->kernel->size % 2))
-        return;
+    /*Iterate*/
+    for (y = portion->y; y < portion->y + portion->h; y++) {
+        for (x = portion->x; x < portion->x + portion->w; x++) {
+            sum_r = sum_g = sum_b = 0.0f;
 
-    y_end = portion->y + portion->h;
-    x_end = portion->x + portion->w;
+            /*Apply the kernel to the current pixel*/
+            for (ky = 0; ky < portion->kernel->size; ky++) {
+                for (kx = 0; kx < portion->kernel->size; kx++) {
+                    /*Get the corresponding pixel in the image*/
+                    size_t px = x + kx - kernel_half;
+                    size_t py = y + ky - kernel_half;
 
-    /** Loop through the image area without rounds (if rounds is not defined) */
-    for (y = portion->y; y < y_end; y++)
-    {
-        for (x = portion->x; x < x_end; x++)
-        {
-            blurPixel(portion->img, portion->img_blur,
-                      portion->kernel, x, y);
+                    /*Ensure pixel is within bounds*/
+                    if (px < portion->img->w && py < portion->img->h) {
+                        size_t idx = py * portion->img->w + px;
+                        float weight = portion->kernel->matrix[ky][kx];
+
+                        /*Accumulate the weighted color values*/
+                        sum_r += portion->img->pixels[idx].r * weight;
+                        sum_g += portion->img->pixels[idx].g * weight;
+                        sum_b += portion->img->pixels[idx].b * weight;
+                    }
+                }
+            }
+
+            /*Set the blurred pixel value in the blurred image*/
+            size_t blurred_idx = y * portion->img_blur->w + x;
+            portion->img_blur->pixels[blurred_idx].r = (unsigned char)sum_r;
+            portion->img_blur->pixels[blurred_idx].g = (unsigned char)sum_g;
+            portion->img_blur->pixels[blurred_idx].b = (unsigned char)sum_b;
         }
     }
-    
-    /** Swap the images for the next blur iteration */
-    img_t *temp = portion->img;
-    portion->img = portion->img_blur;
-    portion->img_blur = temp;
 }
