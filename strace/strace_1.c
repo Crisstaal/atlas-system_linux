@@ -65,6 +65,8 @@ int main(int argc, char *argv[]) {
             long syscall_number = regs.orig_rax;
 #elif defined(__i386__)
             long syscall_number = regs.orig_eax;
+#else
+#error "Unsupported architecture"
 #endif
 
             printf("%s\n", get_syscall_name(syscall_number));
