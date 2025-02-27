@@ -1,11 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #define SYSCALL_ERROR -1
 #define PORT 12345
 #define BACKLOG 8
+
+/**
+ * initialize_server - Initializes the server address struct.
+ * @server_addr: Pointer to the server address struct.
+ */
+void initialize_server(struct sockaddr_in *server_addr)
+{
+	server_addr->sin_family = AF_INET;
+	server_addr->sin_port = htons(PORT);
+	server_addr->sin_addr.s_addr = htonl(INADDR_ANY);
+}
 
 /**
  * create_socket - Creates a socket and handles errors.
@@ -13,13 +27,13 @@
  */
 int create_socket(void)
 {
-    int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock_fd == SYSCALL_ERROR)
-    {
-        perror("socket");
-        exit(EXIT_FAILURE);
-    }
-    return sock_fd;
+	int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock_fd == SYSCALL_ERROR)
+	{
+		perror("socket");
+		exit(EXIT_FAILURE);
+	}
+	return sock_fd;
 }
 
 /**
@@ -29,12 +43,12 @@ int create_socket(void)
  */
 void bind_socket(int sock_fd, struct sockaddr_in *server_addr)
 {
-    if (bind(sock_fd, (struct sockaddr *)server_addr, sizeof(*server_addr)) == SYSCALL_ERROR)
-    {
-        perror("bind");
-        close(sock_fd);
-        exit(EXIT_FAILURE);
-    }
+	if (bind(sock_fd, (struct sockaddr *)server_addr, sizeof(*server_addr)) == SYSCALL_ERROR)
+	{
+		perror("bind");
+		close(sock_fd);
+		exit(EXIT_FAILURE);
+	}
 }
 
 /**
@@ -43,23 +57,12 @@ void bind_socket(int sock_fd, struct sockaddr_in *server_addr)
  */
 void listen_socket(int sock_fd)
 {
-    if (listen(sock_fd, BACKLOG) == SYSCALL_ERROR)
-    {
-        perror("listen");
-        close(sock_fd);
-        exit(EXIT_FAILURE);
-    }
-}
-
-/**
- * initialize_server - Initializes the server address struct.
- * @server_addr: Pointer to the server address struct.
- */
-void initialize_server(struct sockaddr_in *server_addr)
-{
-    server_addr->sin_family = AF_INET;
-    server_addr->sin_port = htons(PORT);
-    server_addr->sin_addr.s_addr = htonl(INADDR_ANY);
+	if (listen(sock_fd, BACKLOG) == SYSCALL_ERROR)
+	{
+		perror("listen");
+		close(sock_fd);
+		exit(EXIT_FAILURE);
+	}
 }
 
 /**
@@ -68,13 +71,16 @@ void initialize_server(struct sockaddr_in *server_addr)
  */
 void run_server(int sock_fd)
 {
-    printf("Server listening on port %d\n", PORT);
+	printf("Server listening on port %d\n", PORT);
 
-    /* Hang indefinitely */
-    while (1)
-    {
-        pause(); /* Wait for signals */
-    }
+	/* Hang indefinitely */
+	while (1)
+	{
+		pause(); /* Wait for signals */
+	}
+
+	/* Close the socket (though this won't be reached) */
+	close(sock_fd);
 }
 
 /**
@@ -83,14 +89,14 @@ void run_server(int sock_fd)
  */
 int main(void)
 {
-    int sock_fd;
-    struct sockaddr_in server_addr;
+	int sock_fd;
+	struct sockaddr_in server_addr;
 
-    initialize_server(&server_addr);
-    sock_fd = create_socket();
-    bind_socket(sock_fd, &server_addr);
-    listen_socket(sock_fd);
-    run_server(sock_fd);
+	initialize_server(&server_addr);
+	sock_fd = create_socket();
+	bind_socket(sock_fd, &server_addr);
+	listen_socket(sock_fd);
+	run_server(sock_fd);
 
-    return (0);
+	return (0);
 }
