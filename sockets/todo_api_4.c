@@ -25,84 +25,9 @@ typedef struct todo
 todo_t todos[MAX_TODOS];
 int todo_count = 0;
 
-/**
- * send_response - Sends an HTTP response
- * @client_fd: The client file descriptor
- * @status: HTTP status code
- * @message: HTTP status message
- * @body: Response body
- */
-void send_response(int client_fd, int status, char *message, char *body)
-{
-    char response[BUFFER_SIZE];
-    int response_length;
-
-    // Build the response line
-    response_length = snprintf(response, sizeof(response),
-        "HTTP/1.1 %d %s\r\n"
-        "Content-Type: application/json\r\n"
-        "Content-Length: %lu\r\n"
-        "Connection: close\r\n\r\n"
-        "%s",
-        status, message, strlen(body), body);
-
-    send(client_fd, response, response_length, 0);
-}
-
-/**
- * handle_post_todos - Handles POST /todos requests
- * @client_fd: The client file descriptor
- * @body: The request body
- */
-void handle_post_todos(int client_fd, char *body)
-{
-    char *title = strstr(body, "title=");
-    char *desc = strstr(body, "description=");
-
-    if (!title || !desc)
-    {
-        send_response(client_fd, 422, "Unprocessable Entity", "");
-        return;
-    }
-
-    title += 6;  // Move past "title="
-    desc += 12;  // Move past "description="
-
-    if (todo_count >= MAX_TODOS)
-        return;
-
-    todos[todo_count].id = todo_count;
-    strcpy(todos[todo_count].title, title);
-    strcpy(todos[todo_count].description, desc);
-    todo_count++;
-
-    char response_body[512];
-    snprintf(response_body, sizeof(response_body),
-        "{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\"}",
-        todos[todo_count - 1].id, title, desc);
-    send_response(client_fd, 201, "Created", response_body);
-}
-
-/**
- * handle_get_todos - Handles GET /todos requests
- * @client_fd: The client file descriptor
- */
-void handle_get_todos(int client_fd)
-{
-    char response_body[BUFFER_SIZE] = "[";
-    for (int i = 0; i < todo_count; i++)
-    {
-        char todo_entry[256];
-        snprintf(todo_entry, sizeof(todo_entry),
-            "{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\"}",
-            todos[i].id, todos[i].title, todos[i].description);
-        strcat(response_body, todo_entry);
-        if (i < todo_count - 1)
-            strcat(response_body, ",");
-    }
-    strcat(response_body, "]");
-    send_response(client_fd, 200, "OK", response_body);
-}
+void send_response(int client_fd, int status, char *message, char *body);
+void handle_post_todos(int client_fd, char *body);
+void handle_get_todos(int client_fd);
 
 /**
  * parse_request - Parses the HTTP request
@@ -159,6 +84,77 @@ void handle_client(int client_fd)
         send_response(client_fd, 404, "Not Found", "");
 
     close(client_fd);
+}
+
+/**
+ * handle_post_todos - Handles POST /todos requests
+ * @client_fd: The client file descriptor
+ * @body: The request body
+ */
+void handle_post_todos(int client_fd, char *body)
+{
+    char *title = strstr(body, "title=");
+    char *desc = strstr(body, "description=");
+
+    if (!title || !desc)
+    {
+        send_response(client_fd, 422, "Unprocessable Entity", "");
+        return;
+    }
+
+    title += 6;
+    desc += 12;
+    if (todo_count >= MAX_TODOS)
+        return;
+
+    todos[todo_count].id = todo_count;
+    strcpy(todos[todo_count].title, title);
+    strcpy(todos[todo_count].description, desc);
+    todo_count++;
+
+    char response_body[512];
+    snprintf(response_body, sizeof(response_body),
+             "{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\"}",
+             todos[todo_count - 1].id, title, desc);
+    send_response(client_fd, 201, "Created", response_body);
+}
+
+/**
+ * handle_get_todos - Handles GET /todos requests
+ * @client_fd: The client file descriptor
+ */
+void handle_get_todos(int client_fd)
+{
+    char response_body[BUFFER_SIZE] = "[";
+    for (int i = 0; i < todo_count; i++)
+    {
+        char todo_entry[256];
+        snprintf(todo_entry, sizeof(todo_entry),
+                 "{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\"}",
+                 todos[i].id, todos[i].title, todos[i].description);
+        strcat(response_body, todo_entry);
+        if (i < todo_count - 1)
+            strcat(response_body, ",");
+    }
+    strcat(response_body, "]");
+    send_response(client_fd, 200, "OK", response_body);
+}
+
+/**
+ * send_response - Sends an HTTP response
+ * @client_fd: The client file descriptor
+ * @status: HTTP status code
+ * @message: HTTP status message
+ * @body: Response body
+ */
+void send_response(int client_fd, int status, char *message, char *body)
+{
+    char response[BUFFER_SIZE];
+    int content_length = strlen(body);
+    snprintf(response, sizeof(response),
+             "HTTP/1.1 %d %s\r\nContent-Length: %d\r\nContent-Type: application/json\r\n\r\n%s",
+             status, message, content_length, body);
+    send(client_fd, response, strlen(response), 0);
 }
 
 /**
