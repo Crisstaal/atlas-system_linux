@@ -34,28 +34,7 @@ void bind_socket(int server_fd, struct sockaddr_in *server_addr)
 	}
 }
 
-void listen_for_connections(int server_fd)
-{
-	if (listen(server_fd, 1) == -1)
-	{
-		perror("listen");
-		close(server_fd);
-		exit(EXIT_FAILURE);
-	}
-}
-
-void accept_client(int server_fd, int *client_fd, struct sockaddr_in *client_addr, socklen_t *client_len)
-{
-	*client_fd = accept(server_fd, (struct sockaddr *)client_addr, client_len);
-	if (*client_fd == -1)
-	{
-		perror("accept");
-		close(server_fd);
-		exit(EXIT_FAILURE);
-	}
-}
-
-void receive_message(int client_fd)
+void handle_client(int client_fd)
 {
 	char buffer[BUFFER_SIZE];
 	ssize_t bytes_received = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
@@ -79,17 +58,29 @@ int main(void)
 	create_socket(&server_fd);
 	configure_server(&server_addr);
 	bind_socket(server_fd, &server_addr);
-	listen_for_connections(server_fd);
+
+	if (listen(server_fd, 1) == -1)
+	{
+		perror("listen");
+		close(server_fd);
+		exit(EXIT_FAILURE);
+	}
 
 	printf("Server listening on port %d\n", PORT);
 
-	accept_client(server_fd, &client_fd, &client_addr, &client_len);
+	client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
+	if (client_fd == -1)
+	{
+		perror("accept");
+		close(server_fd);
+		exit(EXIT_FAILURE);
+	}
 
 	/* Print client IP address */
 	printf("Client connected: %s\n", inet_ntoa(client_addr.sin_addr));
 
-	/* Receive message */
-	receive_message(client_fd);
+	/* Handle client message */
+	handle_client(client_fd);
 
 	/* Close the connection */
 	close(client_fd);
