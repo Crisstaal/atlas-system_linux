@@ -84,3 +84,21 @@ void run_server(int sock_fd)
 	/* Close the socket (though this won't be reached) */
 	close(sock_fd);
 }
+
+/**
+ * main - Entry point for the program.
+ * Return: 0 on success.
+ */
+int main(void)
+{
+	int sock_fd;
+	struct sockaddr_in server_addr;
+
+	initialize_server(&server_addr);
+	sock_fd = create_socket();
+	bind_socket(sock_fd, &server_addr);
+	listen_socket(sock_fd);
+	run_server(sock_fd);
+
+	return (0);
+}
