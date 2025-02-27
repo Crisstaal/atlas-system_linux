@@ -28,6 +28,7 @@ void initialize_server(struct sockaddr_in *server_addr)
 int create_socket(void)
 {
 	int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+
 	if (sock_fd == SYSCALL_ERROR)
 	{
 		perror("socket");
@@ -43,7 +44,8 @@ int create_socket(void)
  */
 void bind_socket(int sock_fd, struct sockaddr_in *server_addr)
 {
-	if (bind(sock_fd, (struct sockaddr *)server_addr, sizeof(*server_addr)) == SYSCALL_ERROR)
+	if (bind(sock_fd, (struct sockaddr *)server_addr,
+	sizeof(*server_addr)) == SYSCALL_ERROR)
 	{
 		perror("bind");
 		close(sock_fd);
