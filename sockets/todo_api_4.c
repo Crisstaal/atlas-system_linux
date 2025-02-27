@@ -3,186 +3,194 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
 
 #define PORT 8080
 #define BUFFER_SIZE 4096
+#define MAX_TODOS 100
 
+/**
+ * struct todo - Represents a todo item
+ * @id: Unique identifier
+ * @title: Title of the todo
+ * @description: Description of the todo
+ */
 typedef struct todo
 {
-	int id;
-	char title[256];
-	char description[1024];
+    int id;
+    char title[256];
+    char description[512];
 } todo_t;
 
-todo_t todos[100];
+todo_t todos[MAX_TODOS];
 int todo_count = 0;
 
+void send_response(int client_fd, int status, char *message, char *body);
+void handle_post_todos(int client_fd, char *body);
+void handle_get_todos(int client_fd);
+
 /**
- * send_response - Sends an HTTP response to the client.
- * @client_fd: Client socket.
- * @status: HTTP status code and message.
- * @body: JSON body of the response.
+ * parse_request - Parses the HTTP request
+ * @buffer: The request buffer
+ * @method: Buffer for HTTP method
+ * @path: Buffer for request path
+ * @body: Buffer for request body
  */
-void send_response(int client_fd, const char *status, const char *body)
+void parse_request(char *buffer, char *method, char *path, char *body)
 {
-	char response[BUFFER_SIZE];
+    char *line = strtok(buffer, "\r\n");
+    char *content_length;
+    *body = '\0';
 
-	sprintf(response,
-		"HTTP/1.1 %s\r\n"
-		"Content-Length: %ld\r\n"
-		"Content-Type: application/json\r\n\r\n"
-		"%s",
-		status, body ? strlen(body) : 0, body ? body : "");
+    if (!line)
+        return;
 
-	send(client_fd, response, strlen(response), 0);
+    sscanf(line, "%s %s", method, path);
+    while ((line = strtok(NULL, "\r\n")))
+    {
+        if (strncmp(line, "Content-Length:", 15) == 0)
+        {
+            content_length = line + 16;
+        }
+        if (*line == '\0')
+        {
+            strcpy(body, strtok(NULL, "\r\n"));
+            break;
+        }
+    }
 }
 
 /**
- * parse_http_request - Parses HTTP request to extract method, path, and body.
- * @request: The raw HTTP request.
- * @method: Buffer to store the extracted method.
- * @path: Buffer to store the extracted path.
- * @body: Buffer to store the extracted body.
- * @content_length: Pointer to store Content-Length value.
- */
-void parse_http_request(char *request, char *method, char *path,
-			char *body, int *content_length)
-{
-	char *line = strtok(request, "\r\n");
-
-	if (line)
-		sscanf(line, "%s %s HTTP/1.1", method, path);
-
-	while ((line = strtok(NULL, "\r\n")) != NULL)
-	{
-		if (strncmp(line, "Content-Length:", 15) == 0)
-			*content_length = atoi(line + 15);
-		else if (strcmp(line, "") == 0)
-			strcpy(body, strtok(NULL, ""));
-	}
-}
-
-/**
- * parse_body_params - Extracts title and description from body.
- * @body: The request body.
- * @title: Buffer to store title.
- * @description: Buffer to store description.
- * Return: 1 if both params are found, 0 otherwise.
- */
-int parse_body_params(char *body, char *title, char *description)
-{
-	char *param = strtok(body, "&"), *key, *value;
-	int found_title = 0, found_desc = 0;
-
-	while (param)
-	{
-		key = strtok(param, "=");
-		value = strtok(NULL, "=");
-		if (key && value)
-		{
-			if (strcmp(key, "title") == 0)
-			{
-				strcpy(title, value);
-				found_title = 1;
-			}
-			else if (strcmp(key, "description") == 0)
-			{
-				strcpy(description, value);
-				found_desc = 1;
-			}
-		}
-		param = strtok(NULL, "&");
-	}
-	return (found_title && found_desc);
-}
-
-/**
- * handle_post_todo - Handles POST requests to /todos.
- * @client_fd: Client socket.
- * @body: Request body.
- * @content_length: Content-Length value.
- */
-void handle_post_todo(int client_fd, char *body, int content_length)
-{
-	char title[256] = {0}, description[1024] = {0}, response_body[BUFFER_SIZE];
-
-	if (content_length <= 0)
-		return (send_response(client_fd, "411 Length Required", NULL));
-
-	if (!parse_body_params(body, title, description))
-		return (send_response(client_fd, "422 Unprocessable Entity", NULL));
-
-	todos[todo_count].id = todo_count;
-	strcpy(todos[todo_count].title, title);
-	strcpy(todos[todo_count].description, description);
-	todo_count++;
-
-	sprintf(response_body, "{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\"}",
-		todo_count - 1, title, description);
-	send_response(client_fd, "201 Created", response_body);
-}
-
-/**
- * handle_client - Processes client request and sends appropriate response.
- * @client_fd: Client socket.
+ * handle_client - Handles client requests
+ * @client_fd: The client file descriptor
  */
 void handle_client(int client_fd)
 {
-	char buffer[BUFFER_SIZE] = {0}, method[8] = {0}, path[256] = {0};
-	char body[BUFFER_SIZE] = {0};
-	int content_length = 0;
+    char buffer[BUFFER_SIZE], method[8], path[256], body[BUFFER_SIZE];
+    ssize_t bytes_received;
 
-	recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
-	parse_http_request(buffer, method, path, body, &content_length);
+    bytes_received = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
+    if (bytes_received <= 0)
+        return;
 
-	if (strcmp(method, "POST") == 0 && strcmp(path, "/todos") == 0)
-		handle_post_todo(client_fd, body, content_length);
-	else
-		send_response(client_fd, "404 Not Found", NULL);
+    buffer[bytes_received] = '\0';
+    parse_request(buffer, method, path, body);
 
-	close(client_fd);
+    if (strcmp(method, "POST") == 0 && strcmp(path, "/todos") == 0)
+        handle_post_todos(client_fd, body);
+    else if (strcmp(method, "GET") == 0 && strcmp(path, "/todos") == 0)
+        handle_get_todos(client_fd);
+    else
+        send_response(client_fd, 404, "Not Found", "");
+
+    close(client_fd);
 }
 
 /**
- * main - Creates a TCP server that handles REST API requests.
- * Return: 0 on success, 1 on failure.
+ * handle_post_todos - Handles POST /todos requests
+ * @client_fd: The client file descriptor
+ * @body: The request body
+ */
+void handle_post_todos(int client_fd, char *body)
+{
+    char *title = strstr(body, "title=");
+    char *desc = strstr(body, "description=");
+
+    if (!title || !desc)
+    {
+        send_response(client_fd, 422, "Unprocessable Entity", "");
+        return;
+    }
+
+    title += 6;
+    desc += 12;
+    if (todo_count >= MAX_TODOS)
+        return;
+
+    todos[todo_count].id = todo_count;
+    strcpy(todos[todo_count].title, title);
+    strcpy(todos[todo_count].description, desc);
+    todo_count++;
+
+    char response_body[512];
+    snprintf(response_body, sizeof(response_body),
+             "{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\"}",
+             todos[todo_count - 1].id, title, desc);
+    send_response(client_fd, 201, "Created", response_body);
+}
+
+/**
+ * handle_get_todos - Handles GET /todos requests
+ * @client_fd: The client file descriptor
+ */
+void handle_get_todos(int client_fd)
+{
+    char response_body[BUFFER_SIZE] = "[";
+    for (int i = 0; i < todo_count; i++)
+    {
+        char todo_entry[256];
+        snprintf(todo_entry, sizeof(todo_entry),
+                 "{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\"}",
+                 todos[i].id, todos[i].title, todos[i].description);
+        strcat(response_body, todo_entry);
+        if (i < todo_count - 1)
+            strcat(response_body, ",");
+    }
+    strcat(response_body, "]");
+    send_response(client_fd, 200, "OK", response_body);
+}
+
+/**
+ * send_response - Sends an HTTP response
+ * @client_fd: The client file descriptor
+ * @status: HTTP status code
+ * @message: HTTP status message
+ * @body: Response body
+ */
+void send_response(int client_fd, int status, char *message, char *body)
+{
+    char response[BUFFER_SIZE];
+    int content_length = strlen(body);
+    snprintf(response, sizeof(response),
+             "HTTP/1.1 %d %s\r\nContent-Length: %d\r\nContent-Type: application/json\r\n\r\n%s",
+             status, message, content_length, body);
+    send(client_fd, response, strlen(response), 0);
+}
+
+/**
+ * main - Entry point of the HTTP server
+ * Return: Always 0
  */
 int main(void)
 {
-	int server_fd, client_fd;
-	struct sockaddr_in address;
-	socklen_t addr_len = sizeof(address);
-	char client_ip[INET_ADDRSTRLEN];
+    int server_fd, client_fd;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t client_addr_len = sizeof(client_addr);
 
-	server_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (server_fd == -1)
-		return (perror("socket"), 1);
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd == -1)
+        return (EXIT_FAILURE);
 
-	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(PORT);
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT);
 
-	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
-		return (perror("bind"), 1);
+    if (bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1 ||
+        listen(server_fd, 5) == -1)
+    {
+        close(server_fd);
+        return (EXIT_FAILURE);
+    }
+    printf("Server listening on port %d\n", PORT);
 
-	if (listen(server_fd, 10) < 0)
-		return (perror("listen"), 1);
+    while (1)
+    {
+        client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
+        if (client_fd == -1)
+            continue;
+        handle_client(client_fd);
+    }
 
-	printf("Server listening on port %d\n", PORT);
-
-	while (1)
-	{
-		client_fd = accept(server_fd, (struct sockaddr *)&address, &addr_len);
-		if (client_fd < 0)
-		{
-			perror("accept");
-			continue;
-		}
-		inet_ntop(AF_INET, &address.sin_addr, client_ip, INET_ADDRSTRLEN);
-		printf("%s %s %s\n", client_ip, "POST", "/todos");
-		handle_client(client_fd);
-	}
-
-	close(server_fd);
-	return (0);
+    close(server_fd);
+    return (0);
 }
