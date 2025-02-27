@@ -34,7 +34,7 @@ int create_socket(void)
 		perror("socket");
 		exit(EXIT_FAILURE);
 	}
-	return sock_fd;
+	return (sock_fd);
 }
 
 /**
