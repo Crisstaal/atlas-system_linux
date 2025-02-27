@@ -5,66 +5,98 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <string.h>
 
-#define PORT 12345
-#define BACKLOG 5
 #define SYSCALL_ERROR -1
+#define PORT 12345
+#define BACKLOG 8
 
-int main(void)
+/**
+ * initialize_server - Initializes the server address struct.
+ * @server_addr: Pointer to the server address struct.
+ */
+void initialize_server(struct sockaddr_in *server_addr)
 {
-	int sock_fd, client_fd;
-	struct sockaddr_in server_addr, client_addr;
-	socklen_t client_len = sizeof(client_addr);
-	char client_ip[INET_ADDRSTRLEN];
+	server_addr->sin_family = AF_INET;
+	server_addr->sin_port = htons(PORT);
+	server_addr->sin_addr.s_addr = htonl(INADDR_ANY);
+}
 
-	/* Create socket */
-	sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+/**
+ * create_socket - Creates a socket and handles errors.
+ * Return: File descriptor for the socket.
+ */
+int create_socket(void)
+{
+	int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock_fd == SYSCALL_ERROR)
 	{
 		perror("socket");
 		exit(EXIT_FAILURE);
 	}
+	return sock_fd;
+}
 
-	/* Configure server address struct */
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(PORT);
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	/* Bind socket */
-	if (bind(sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == SYSCALL_ERROR)
+/**
+ * bind_socket - Binds the socket to the server address.
+ * @sock_fd: File descriptor of the socket.
+ * @server_addr: Pointer to the server address struct.
+ */
+void bind_socket(int sock_fd, struct sockaddr_in *server_addr)
+{
+	if (bind(sock_fd, (struct sockaddr *)server_addr, sizeof(*server_addr)) == SYSCALL_ERROR)
 	{
 		perror("bind");
 		close(sock_fd);
 		exit(EXIT_FAILURE);
 	}
+}
 
-	/* Listen for incoming connections */
+/**
+ * listen_socket - Puts the socket in listening mode.
+ * @sock_fd: File descriptor of the socket.
+ */
+void listen_socket(int sock_fd)
+{
 	if (listen(sock_fd, BACKLOG) == SYSCALL_ERROR)
 	{
 		perror("listen");
 		close(sock_fd);
 		exit(EXIT_FAILURE);
 	}
+}
 
+/**
+ * run_server - Main server loop.
+ * @sock_fd: File descriptor of the socket.
+ */
+void run_server(int sock_fd)
+{
 	printf("Server listening on port %d\n", PORT);
 
-	/* Accept a client connection */
-	client_fd = accept(sock_fd, (struct sockaddr *)&client_addr, &client_len);
-	if (client_fd == SYSCALL_ERROR)
+	/* Hang indefinitely */
+	while (1)
 	{
-		perror("accept");
-		close(sock_fd);
-		exit(EXIT_FAILURE);
+		pause(); /* Wait for signals */
 	}
 
-	/* Get and print client's IP address */
-	inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
-	printf("Client connected: %s\n", client_ip);
-
-	/* Close client and server sockets */
-	close(client_fd);
+	/* Close the socket (though this won't be reached) */
 	close(sock_fd);
+}
+
+/**
+ * main - Entry point for the program.
+ * Return: 0 on success.
+ */
+int main(void)
+{
+	int sock_fd;
+	struct sockaddr_in server_addr;
+
+	initialize_server(&server_addr);
+	sock_fd = create_socket();
+	bind_socket(sock_fd, &server_addr);
+	listen_socket(sock_fd);
+	run_server(sock_fd);
 
 	return (0);
 }
