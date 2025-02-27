@@ -26,7 +26,8 @@ void configure_server(struct sockaddr_in *server_addr)
 
 void bind_socket(int server_fd, struct sockaddr_in *server_addr)
 {
-	if (bind(server_fd, (struct sockaddr *)server_addr, sizeof(*server_addr)) == -1)
+	if (bind(server_fd, (struct sockaddr *)server_addr,
+	sizeof(*server_addr)) == -1)
 	{
 		perror("bind");
 		close(server_fd);
@@ -38,6 +39,7 @@ void handle_client(int client_fd)
 {
 	char buffer[BUFFER_SIZE];
 	ssize_t bytes_received = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
+
 	if (bytes_received > 0)
 	{
 		buffer[bytes_received] = '\0'; /* Null-terminate the string */
